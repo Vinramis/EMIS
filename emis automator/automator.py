@@ -4,6 +4,8 @@ import os
 from playwright.sync_api import sync_playwright
 import pandas as pd
 
+# test message
+
 # --- Конфигурация ---
 
 ONE_ID_LOGIN_URL = "https://emis.edu.uz/login"
