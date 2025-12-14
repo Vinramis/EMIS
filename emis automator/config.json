@@ -1,0 +1,15 @@
+{
+    "automation_settings": {
+        "LINE_COUNT": 100,
+        "TOPICS_FILE_PATH": "КТП.xlsx",
+        "START_CELL": "B6",
+        "START_FROM_LINE": 1,
+        "MODE": "col",
+        "TOPICS_FOLDER": "КЛ",
+        "HOMEWORK_FOLDER": "ДЗ"
+    },
+    "credentials": {
+        "login": "muravleva_natalya",
+        "password": "6R8t2vLEuZzV_C"
+    }
+}
