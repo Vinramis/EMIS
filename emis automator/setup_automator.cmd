@@ -79,10 +79,6 @@ set "DEFAULT_MODE=col"
 set "DEFAULT_TOPICS_FOLDER=КЛ"
 set "DEFAULT_HOMEWORK_FOLDER=ДЗ"
 
-set "LINE_COUNT="
-set /p "LINE_COUNT=Введите номер последней темы (Если ) [%DEFAULT_LINE_COUNT%]: "
-if not defined LINE_COUNT set "LINE_COUNT=%DEFAULT_LINE_COUNT%"
-
 echo.
 set "TOPICS_FILE_PATH="
 set /p "TOPICS_FILE_PATH=Введите путь к файлу Excel с темами [%DEFAULT_TOPICS_FILE_PATH%]: "
@@ -98,17 +94,23 @@ set "START_FROM_LINE="
 set /p "START_FROM_LINE=С какой темы начать обработку (номером) [%DEFAULT_START_FROM_LINE%]: "
 if not defined START_FROM_LINE set "START_FROM_LINE=%DEFAULT_START_FROM_LINE%"
 
+set "LINE_COUNT="
+set /p "LINE_COUNT=На какой теме закончить обработку (номером) [%DEFAULT_LINE_COUNT%]: "
+if not defined LINE_COUNT set "LINE_COUNT=%DEFAULT_LINE_COUNT%"
+
 
 echo.
 :GET_MODE
-set "MODE_INPUT="
-@REM echo Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]:
-set /p "MODE_INPUT=Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]: "
-if "!MODE_INPUT!"=="1" (
-    set "MODE=row"
-) else (
-    set "MODE=!DEFAULT_MODE!"
-)
+@REM DEPRECATED 
+@REM set "MODE_INPUT="
+@REM @REM echo Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]:
+@REM set /p "MODE_INPUT=Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]: "
+@REM if "!MODE_INPUT!"=="1" (
+@REM     set "MODE=row"
+@REM ) else (
+@REM     set "MODE=!DEFAULT_MODE!"
+@REM )
+set "MODE_INPUT=%DEFAULT_MODE%"
 
 echo.
 echo.
@@ -127,9 +129,6 @@ if not defined HOMEWORK_FOLDER set "HOMEWORK_FOLDER=%DEFAULT_HOMEWORK_FOLDER%"
 set "JSON_TOPICS_FILE_PATH=!TOPICS_FILE_PATH:\=\\!"
 set "JSON_TOPICS_FOLDER=!TOPICS_FOLDER:\=\\!"
 set "JSON_HOMEWORK_FOLDER=!HOMEWORK_FOLDER:\=\\!"
-
-:: --- Trim spaces for login and password ---
-
 
 :: --- Create config.json ---
 echo.
@@ -161,22 +160,34 @@ echo.
 :: --- Install/Check Dependencies ---
 echo.
 echo ---------------------------------------------------
-echo Проверка и установка зависимостей в фоновом режиме... Это может занять несколько минут.
-:: Check if Python is installed
-python --version >nul 2>&1
-if errorlevel 1 (
+echo (?) Необходимо при первом запуске установить библиотки и зависимости.
+set "library_install="
+set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
+if not defined library_install set "library_install=n"
+if "!library_install!"=="1" (
     winget install Python >nul 2>&1
+    python -m pip install playwright pandas >nul 2>&1
+    python -m playwright install >nul 2>&1
+    pip install playwright >nul 2>&1
+    playwright install >nul 2>&1
+    pip install openpyxl >nul 2>&1
+    echo Зависимости установлены.
 )
 
-:: Install libraries if not installed
-winget install Python >nul 2>&1
-python -m pip install playwright pandas  >nul 2>&1
-python -m playwright install >nul 2>&1
-pip install playwright >nul 2>&1
-playwright install >nul 2>&1
-pip install openpyxl >nul 2>&1
+@REM DEPRECATED
+@REM :: Check if Python is installed
+@REM python --version >nul 2>&1
+@REM if errorlevel 1 (
+@REM     winget install Python >nul 2>&1
+@REM )
+@REM :: Install libraries if not installed
+@REM winget install Python >nul 2>&1
+@REM python -m pip install playwright pandas  >nul 2>&1
+@REM python -m playwright install >nul 2>&1
+@REM pip install playwright >nul 2>&1
+@REM playwright install >nul 2>&1
+@REM pip install openpyxl >nul 2>&1
 
-echo Зависимости установлены.
 echo ---------------------------------------------------
 echo.
 echo Настройка завершена! Запускаем автоматизатор...

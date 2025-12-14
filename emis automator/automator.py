@@ -97,29 +97,29 @@ def find_file_by_prefix(directory: str, prefix: str):
     
     return None
 
-def find_file_by_leading_count(directory: str, count: int):
-    """
-    Находит первый файл в указанной директории, имя которого начинается с заданного числа.
-    Возвращает имя файла или None, если файл не найден.
-    """
-    count_str = str(count)
-    wrong_symbol_counter = 0
-    wrong_symbol_counter_ceeling = 5
+# def find_file_by_leading_count(directory: str, count: int):
+#     """
+#     Находит первый файл в указанной директории, имя которого начинается с заданного числа.
+#     Возвращает имя файла или None, если файл не найден.
+#     """
+#     count_str = str(count)
+#     wrong_symbol_counter = 0
+#     wrong_symbol_counter_ceeling = 5
 
-    try:
-        for filename in os.listdir(directory):
-            length_of_count = len(count_str)
-            length_of_filename = len(filename)
-            # Сравнение без учета регистра и с удалением пробелов для надежности
-            while (i=0, i=+, wrong_symbol_counter < wrong_symbol_counter_ceeling and i < length_of_filename):
-                if filename.lower().startswith(count_str):
-                    return filename
-    except FileNotFoundError:
-        print(f"[ОШИБКА] Директория '{directory}' не существует.")
-        return None
-    except Exception as e:
-        print(f"[ОШИБКА] Произошла ошибка при поиске в директории '{directory}': {e}")
-        return None
+#     try:
+#         for filename in os.listdir(directory):
+#             length_of_count = len(count_str)
+#             length_of_filename = len(filename)
+#             # Сравнение без учета регистра и с удалением пробелов для надежности
+#             while (i=0, i=+, wrong_symbol_counter < wrong_symbol_counter_ceeling and i < length_of_filename):
+#                 if filename.lower().startswith(count_str):
+#                     return filename
+#     except FileNotFoundError:
+#         print(f"[ОШИБКА] Директория '{directory}' не существует.")
+#         return None
+#     except Exception as e:
+#         print(f"[ОШИБКА] Произошла ошибка при поиске в директории '{directory}': {e}")
+#         return None
 
 def next_col(col):
     """Инкрементирует буквенное обозначение столбца Excel (A -> B, Z -> AA)."""
@@ -223,109 +223,106 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         #     print("(?) Просто распределите оставшиеся файлы вручную и перезапустите скрипт.")
         #     exit(0)
 
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # Установите True для запуска в фоновом режиме.
+        page = browser.new_page()
 
-    # with sync_playwright() as p:
-    #     browser = p.chromium.launch(headless=False)  # Установите True для запуска в фоновом режиме.
-    #     page = browser.new_page()
+        print(f"Переход на страницу входа...")
+        page.goto(ONE_ID_LOGIN_URL)
 
-    #     print(f"Переход на страницу входа...")
-    #     page.goto(ONE_ID_LOGIN_URL)
+        # --- Вход в систему ---
+        print("Выполняется вход...")
+        page.locator(ONE_ID_BUTTON_SELECTOR).click()
 
-    #     # --- Вход в систему ---
-    #     print("Выполняется вход...")
-    #     page.locator(ONE_ID_BUTTON_SELECTOR).click()
+        page.get_by_placeholder(LOGIN_FIELD_PLACEHOLDER).fill(login)
+        page.get_by_placeholder(PASSWORD_FIELD_PLACEHOLDER).fill(password)
+        page.get_by_text(LOGIN_BUTTON_TEXT).first.click()
 
-    #     page.get_by_placeholder(LOGIN_FIELD_PLACEHOLDER).fill(login)
-    #     page.get_by_placeholder(PASSWORD_FIELD_PLACEHOLDER).fill(password)
-    #     page.get_by_text(LOGIN_BUTTON_TEXT).first.click()
+        page.wait_for_url(SUCCESS_URL)
 
-    #     page.wait_for_url(SUCCESS_URL)
-
-    #     print("Вход выполнен успешно!")
+        print("Вход выполнен успешно!")
 
 
-    #     # --- Подготовка данных ---
-    #     print("Подготовка данных из Excel...")
-    #     df = pd.read_excel(TOPICS_FILE_PATH, header=None)
-    #     start_cell = START_CELL
-    #     mode = MODE
-    #     cell_sequence = generate_sequence(df, start_cell, mode)
-    #     values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
-    #     print(f"Извлечено {len(values)} записей из Excel.")
+        # --- Подготовка данных ---
+        print("Подготовка данных из Excel...")
+        df = pd.read_excel(TOPICS_FILE_PATH, header=None)
+        start_cell = START_CELL
+        mode = MODE
+        cell_sequence = generate_sequence(df, start_cell, mode)
+        values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
+        print(f"Извлечено {len(values)} записей из Excel.")
         
-    #     print(HOMEWORK_FOLDER, TOPICS_FOLDER)
+        # print(HOMEWORK_FOLDER, TOPICS_FOLDER)
 
 
-    #     # --- Автоматизация ---
-    #     print("Запуск автоматизации... \n(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
-    #     page.goto(NEW_TOPIC_URL)
+        # --- Автоматизация ---
+        print("Запуск автоматизации... \n(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
+        page.goto(NEW_TOPIC_URL)
         
-    #     if LINE_COUNT < START_FROM_LINE:
-    #         print(f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({LINE_COUNT}) меньше чем начальное значение ({START_FROM_LINE}).")
-    #         return
+        if LINE_COUNT < START_FROM_LINE:
+            print(f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({LINE_COUNT}) меньше чем начальное значение ({START_FROM_LINE}).")
+            return
 
-    #     actual_length = min(LINE_COUNT, len(values))
-    #     counter = -1
+        actual_length = min(LINE_COUNT, len(values))
+        counter = -1
         
-    #     for i in range(START_FROM_LINE - 1, actual_length):
-    #         counter += 1
-    #         print(f"\n--- Обработка строки {i + 1} из {actual_length} ---")
+        for i in range(START_FROM_LINE - 1, actual_length):
+            counter += 1
+            print(f"\n--- Обработка строки {i + 1} из {actual_length} ---")
 
-    #         topic_name = values[i]
-    #         check_for = str(i+1)
+            topic_name = values[i]
+            check_for = str(i+1)
 
-    #         # Динамический поиск файлов темы и домашнего задания
-    #         print(f"Поиск файла темы, начинающегося с: '{check_for}' в папке '{TOPICS_FOLDER}'")
-    #         topic_file_path = find_file_by_prefix(TOPICS_FOLDER, check_for)
-    #         homework_file_path = find_file_by_prefix(HOMEWORK_FOLDER, check_for)
+            # Динамический поиск файлов темы и домашнего задания
+            # print(f"Поиск файла темы, начинающегося с: '{check_for}' в папке '{TOPICS_FOLDER}'")
+            topic_file_path = find_file_by_prefix(TOPICS_FOLDER, check_for)
+            homework_file_path = find_file_by_prefix(HOMEWORK_FOLDER, check_for)
 
-    #         if not topic_file_path or not homework_file_path:
-    #             print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось найти необходимые файлы для темы '{check_for}'. Пропускаем.")
-    #             if not topic_file_path: print(f"   - Файл темы отсутствует в папке '{TOPICS_FOLDER}'")
-    #             if not homework_file_path: print(f"   - Файл домашнего задания отсутствует в папке '{HOMEWORK_FOLDER}'")
+            if not topic_file_path: print(f"   - Файл темы отсутствует в папке '{TOPICS_FOLDER}'")
+            if not homework_file_path: print(f"   - Файл домашнего задания отсутствует в папке '{HOMEWORK_FOLDER}'")
 
-    #         try:
-    #             # time.sleep(3)
-    #             print("Нажатие 'Добавить строку'...")
-    #             page.locator(ADD_LINE_BUTTON).click()
-    #             time.sleep(0.01)
+            try:
+                # time.sleep(3)
+                print("Нажатие 'Добавить строку'...")
+                page.locator(ADD_LINE_BUTTON).click()
+                time.sleep(0.01)
 
-    #             if topic_name is None:
-    #                 print("[КРИТИЧЕСКАЯ ОШИБКА] Имя темы не определено. Что-то пошло не так.")
-    #                 exit(1)
+                if topic_name is None:
+                    print("[КРИТИЧЕСКАЯ ОШИБКА] Имя темы не определено. Что-то пошло не так.")
+                    exit(1)
 
-    #             print(f"Заполнение названия темы: '{topic_name}'")
-    #             page.locator(f"{topics}{1000+counter}{TOPIC_NAME}").fill(topic_name)
+                print(f"Заполнение названия темы: '{topic_name}'")
+                page.locator(f"{topics}{1000+counter}{TOPIC_NAME}").fill(topic_name)
 
-    #             if topic_file_path is not None:
-    #                 print(f"Загрузка файла темы: {topic_file_path}")
-    #                 page.locator(f"{topics}{1000+counter}{TOPIC_FILE}").set_input_files(topic_file_path)
+                if topic_file_path is not None:
+                    print(f"Загрузка файла темы: {topic_file_path}")
+                    page.locator(f"{topics}{1000+counter}{TOPIC_FILE}").set_input_files(topic_file_path)
 
-    #             if homework_file_path is not None:
-    #                 print(f"Загрузка файла домашнего задания: {homework_file_path}")
-    #                 page.locator(f"{topics}{1000+counter}{HOMEWORK_FILE}").set_input_files(homework_file_path)
+                if homework_file_path is not None:
+                    print(f"Загрузка файла домашнего задания: {homework_file_path}")
+                    page.locator(f"{topics}{1000+counter}{HOMEWORK_FILE}").set_input_files(homework_file_path)
 
-    #         except Exception as e:
-    #             print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1}: {e}")
-    #             print("Сохранение скриншота ошибки.")
-    #             page.screenshot(path="error_screenshot.png")
-    #             break
+            except Exception as e:
+                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1}: {e}")
+                print("Сохранение скриншота ошибки.")
+                page.screenshot(path="error_screenshot.png")
+                break
 
-    #     print("\n--- Автоматизация завершена! ---")
-    #     time.sleep(3)
-    #     print("\n\n\n(?) Теперь вы можете взаимодействовать с браузером. Скрипт завершится после закрытия браузера.\n\n\n")
+        print("\n--- Автоматизация завершена! ---")
+        time.sleep(3)
+        print("\n\n\n(?) Теперь вы можете взаимодействовать с браузером. Скрипт завершится после закрытия браузера.\n\n\n")
 
-    #     # Приостанавливает выполнение скрипта до тех пор, пока пользователь не закроет страницу.
-    #     # while True:
-    #     #     try:
-    #     #         page.wait_for_event("close", 999999)
-    #     #     except Exception:
-    #     #         continue
-    #     #     print("Браузер закрыт. Завершение скрипта.")
-    #     #     time.sleep(3)
-    #     #     exit(0)
+        # Приостанавливает выполнение скрипта до тех пор, пока пользователь не закроет страницу.
+        while True:
+            try:
+                page.wait_for_event("close", 999999)
+            except Exception:
+                continue
+            print("Браузер закрыт. Завершение скрипта.")
+            time.sleep(3)
+            exit(0)
 
-    time.sleep(999999)
+        # time.sleep(999999)
 
 
 
