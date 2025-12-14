@@ -216,10 +216,10 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         if (os.listdir(ALL_FOLDER) == []):
             os.rmdir(ALL_FOLDER)  # Remove the original folder if empty
             print(f"Файлы успешно разделены на папки '{TOPICS_FOLDER}' и '{HOMEWORK_FOLDER}'.")
-        else:
-            print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось полностью разделить файлы. Проверьте папку '{ALL_FOLDER}'.")
-            print("(?) Просто распределите оставшиеся файлы вручную и перезапустите скрипт.")
-            exit(0)
+        # else:
+        #     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось полностью разделить файлы. Проверьте папку '{ALL_FOLDER}'.")
+        #     print("(?) Просто распределите оставшиеся файлы вручную и перезапустите скрипт.")
+        #     exit(0)
 
 
     # with sync_playwright() as p:
