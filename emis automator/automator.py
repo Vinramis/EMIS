@@ -193,14 +193,15 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         homework_files = extract_files(TOPICS_FOLDER, True, homework_keywords)
         all_files = [f for f in all_files if f not in homework_files]
         if len(all_files) > 0:
-            print(f"Остались нераспределенные файлы в папке '{TOPICS_FOLDER}': {all_files}")
+            print(f"[ИНФО] Остались нераспределенные файлы в папке '{TOPICS_FOLDER}': {all_files}")
             print("(?) Просто разделите оставшиеся файлы вручную")
             print("(?) Или добавьте ключевые слова в имена оставшихся файлов и перезапустите скрипт.")
             print(f"\n(?) --- Ключевые слова ---")
             print(f"(?) Для классных работа: {topic_keywords}")
             print(f"(?) Для домашних заданий: {homework_keywords}\n")
             
-            print("(?) Если вы хотите продолжить так, подождите 5 секунд. Иначе - закойроте окно\n")
+            # print("(?) Если вы хотите продолжить так, подождите 5 секунд. Иначе - закойроте окно\n")
+
             time.sleep(5)
 
         ALL_FOLDER = TOPICS_FOLDER
@@ -215,7 +216,7 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
             os.rename(os.path.join(ALL_FOLDER, file), os.path.join(HOMEWORK_FOLDER, file))
         if (os.listdir(ALL_FOLDER) == []):
             os.rmdir(ALL_FOLDER)  # Remove the original folder if empty
-            print(f"Файлы успешно разделены на папки '{TOPICS_FOLDER}' и '{HOMEWORK_FOLDER}'.")
+            print(f"[ИНФО] Файлы успешно разделены на папки '{TOPICS_FOLDER}' и '{HOMEWORK_FOLDER}'.")
         # else:
         #     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось полностью разделить файлы. Проверьте папку '{ALL_FOLDER}'.")
         #     print("(?) Просто распределите оставшиеся файлы вручную и перезапустите скрипт.")
@@ -244,18 +245,11 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         # --- Подготовка данных ---
         print("Подготовка данных из Excel...")
         df = pd.read_excel(TOPICS_FILE_PATH, header=None)
-        print("here 1")
         start_cell = START_CELL
-        print("here 2")
         mode = MODE
-        print("here 3")
         cell_sequence = generate_sequence(df, start_cell, mode)
-        print("here 4")
         values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
-        print("here 5")
         print(f"Извлечено {len(values)} записей из Excel.")
-        
-        # print(HOMEWORK_FOLDER, TOPICS_FOLDER)
 
 
         # --- Автоматизация ---
