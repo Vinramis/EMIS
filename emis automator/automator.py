@@ -194,7 +194,8 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         all_files = [f for f in all_files if f not in homework_files]
         if len(all_files) > 0:
             print(f"Остались нераспределенные файлы в папке '{TOPICS_FOLDER}': {all_files}")
-            print("(?) Просто добавьте ключевые слова в имена оставшихся файлов и перезапустите скрипт.")
+            print("(?) Просто разделите оставшиеся файлы вручную")
+            print("(?) Или добавьте ключевые слова в имена оставшихся файлов и перезапустите скрипт.")
             print(f"\n(?) --- Ключевые слова ---")
             print(f"(?) Для классных работа: {topic_keywords}")
             print(f"(?) Для домашних заданий: {homework_keywords}\n")
