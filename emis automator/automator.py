@@ -319,9 +319,6 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
             time.sleep(1)
             exit(0)
 
-        # time.sleep(999999)
-
-
 
 if __name__ == "__main__":
     try:
