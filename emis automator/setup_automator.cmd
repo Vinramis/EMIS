@@ -41,7 +41,7 @@ set /p "PASSWORD=Введите ваш пароль EMIS: "
 goto :GATHER_SETTINGS
 
 :RECONFIGURE
-echo --- Учетные данные (оставьте пустым, чтобы сохранить существующие) ---
+echo --- Учетные данные (оставьте пустым и нажмите Enter, чтобы сохранить существующие) ---
 echo (?) Существующие учетные данные будут показаны в квадратных скобках.
 :: Try to parse existing credentials to use as defaults
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"login\"" "config.json"') do set "EXISTING_LOGIN=%%~a"
@@ -68,7 +68,7 @@ if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 :GATHER_SETTINGS
 echo.
 echo.
-echo --- Параметры автоматизации (нажмите ENTER для значений по умолчанию) ---
+echo --- Параметры автоматизации (оставьте пустым и нажмите Enter для значений по умолчанию) ---
 echo (?) Значения по умолчанию будут показаны в квадратных скобках.
 set DEFAULT_LINE_COUNT=3
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
