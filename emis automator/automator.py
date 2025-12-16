@@ -71,8 +71,8 @@ def run_automation():
             check_for = str(i + 1)
 
             # Поиск файлов
-            topic_file_path = file_utils.find_file_by_prefix(cfg.TOPICS_FOLDER, check_for)
-            homework_file_path = file_utils.find_file_by_prefix(cfg.HOMEWORK_FOLDER, check_for)
+            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, check_for)
+            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, check_for)
 
             if not topic_file_path: 
                 print(f"[ОШИБКА] Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
