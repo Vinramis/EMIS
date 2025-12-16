@@ -177,7 +177,7 @@ if "!library_install!"=="1" (
     :: Install Python
     winget install Python --silent --accept-source-agreements >nul 2>&1
 
-    :: Install libraries (Combined into one line)
+    :: Install libraries
     python -m pip install playwright pandas openpyxl >nul 2>&1
 
     :: Install only the Safari/WebKit engine
