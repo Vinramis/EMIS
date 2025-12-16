@@ -75,9 +75,9 @@ def run_automation():
             homework_file_path = file_utils.find_file_by_prefix(cfg.HOMEWORK_FOLDER, check_for)
 
             if not topic_file_path: 
-                print(f"   - Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
+                print(f"[ОШИБКА] Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
             if not homework_file_path: 
-                print(f"   - Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
+                print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
 
             try:
                 print("Нажатие 'Добавить строку'...")
