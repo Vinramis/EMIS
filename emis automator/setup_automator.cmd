@@ -78,9 +78,10 @@ set "DEFAULT_MODE=col"
 set "DEFAULT_TOPICS_FOLDER=КЛ"
 set "DEFAULT_HOMEWORK_FOLDER=ДЗ"
 
-echo.
+@REM DEPRECATED
+@REM echo.
 set "TOPICS_FILE_PATH="
-set /p "TOPICS_FILE_PATH=Введите путь к файлу Excel с темами [%DEFAULT_TOPICS_FILE_PATH%]: "
+@REM set /p "TOPICS_FILE_PATH=Введите путь к файлу Excel с темами [%DEFAULT_TOPICS_FILE_PATH%]: "
 if not defined TOPICS_FILE_PATH set "TOPICS_FILE_PATH=%DEFAULT_TOPICS_FILE_PATH%"
 
 echo.
@@ -116,13 +117,17 @@ echo.
 @REM DEPRECATED
 @REM echo (?) Если все файлы находятся в одной папке, укажите ЕЁ для обеих категорий.
 @REM echo.
+
+
 set "TOPICS_FOLDER="
-set /p "TOPICS_FOLDER=Введите имя папки для файлов тем [%DEFAULT_TOPICS_FOLDER%]: "
+@REM DEPRECATED
+@REM set /p "TOPICS_FOLDER=Введите имя папки для файлов тем [%DEFAULT_TOPICS_FOLDER%]: "
 if not defined TOPICS_FOLDER set "TOPICS_FOLDER=%DEFAULT_TOPICS_FOLDER%"
 
-echo.
+@REM echo.
 set "HOMEWORK_FOLDER="
-set /p "HOMEWORK_FOLDER=Введите имя папки для файлов домашних заданий [%DEFAULT_HOMEWORK_FOLDER%]: "
+@REM DEPRECATED
+@REM set /p "HOMEWORK_FOLDER=Введите имя папки для файлов домашних заданий [%DEFAULT_HOMEWORK_FOLDER%]: "
 if not defined HOMEWORK_FOLDER set "HOMEWORK_FOLDER=%DEFAULT_HOMEWORK_FOLDER%"
 
 :: --- Escape backslashes for JSON compatibility ---
@@ -160,7 +165,8 @@ echo.
 :: --- Install/Check Dependencies ---
 echo.
 echo ---------------------------------------------------
-echo (?) Необходимо при первом запуске установить библиотки и зависимости.
+echo Установка библиотек и зависимостей...
+echo (?) Необходимо при первом запуске.
 set "library_install=0"
 set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
 @REM if not defined library_install set "library_install=n"
