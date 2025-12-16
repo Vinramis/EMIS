@@ -114,8 +114,9 @@ set "MODE_INPUT=%DEFAULT_MODE%"
 
 echo.
 echo.
-echo (?) Если все файлы находятся в одной папке, укажите ЕЁ для обеих категорий.
-echo.
+@REM DEPRECATED
+@REM echo (?) Если все файлы находятся в одной папке, укажите ЕЁ для обеих категорий.
+@REM echo.
 set "TOPICS_FOLDER="
 set /p "TOPICS_FOLDER=Введите имя папки для файлов тем [%DEFAULT_TOPICS_FOLDER%]: "
 if not defined TOPICS_FOLDER set "TOPICS_FOLDER=%DEFAULT_TOPICS_FOLDER%"
@@ -165,12 +166,23 @@ set "library_install=0"
 set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
 @REM if not defined library_install set "library_install=n"
 if "!library_install!"=="1" (
-    winget install Python >nul 2>&1
-    python -m pip install playwright pandas >nul 2>&1
-    python -m playwright install >nul 2>&1
-    pip install playwright >nul 2>&1
-    playwright install >nul 2>&1
-    pip install openpyxl >nul 2>&1
+    @REM winget install Python >nul 2>&1
+    @REM python -m pip install playwright pandas openpyxl >nul 2>&1
+    @REM python -m playwright install >nul 2>&1
+    @REM pip install playwright >nul 2>&1
+    @REM playwright install >nul 2>&1
+    @REM pip install openpyxl >nul 2>&1
+
+
+    :: Install Python
+    winget install Python --silent --accept-source-agreements >nul 2>&1
+
+    :: Install libraries (Combined into one line)
+    python -m pip install playwright pandas openpyxl >nul 2>&1
+
+    :: Install only the Safari/WebKit engine
+    python -m playwright install webkit >nul 2>&1
+
     echo Зависимости установлены.
 )
 
