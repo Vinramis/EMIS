@@ -33,9 +33,6 @@ MODE = config["automation_settings"]["MODE"]
 TOPICS_FOLDER = config["automation_settings"]["TOPICS_FOLDER"]
 HOMEWORK_FOLDER = config["automation_settings"]["HOMEWORK_FOLDER"]
 
-
-
-
 # Селекторы для элементов на странице
 topics = "#topics_"
 TOPIC_NAME = "_name"
@@ -309,17 +306,17 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
                 break
 
         print("\n--- Автоматизация завершена! ---")
-        time.sleep(3)
+        time.sleep(2)
         print("\n\n\n(?) Теперь вы можете взаимодействовать с браузером. Скрипт завершится после закрытия браузера.\n\n\n")
 
         # Приостанавливает выполнение скрипта до тех пор, пока пользователь не закроет страницу.
         while True:
             try:
-                page.wait_for_event("close", 999999)
+                page.wait_for_event("close")
             except Exception:
                 continue
-            print("Браузер закрыт. Завершение скрипта.")
-            time.sleep(3)
+            print("Браузер закрыт. Завершение скрипта."/n)
+            time.sleep(1)
             exit(0)
 
         # time.sleep(999999)
