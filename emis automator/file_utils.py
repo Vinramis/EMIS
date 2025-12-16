@@ -50,6 +50,35 @@ def find_file_by_prefix(directory: str, prefix: str):
         return None
     return None
 
+def find_file_by_count(directory: str, count: int):
+    """
+    Finds the file in the directory with the given count.
+    """
+
+    def numbers_in_string(string: str):
+        numbers_found = []
+        number_buffer = ""
+        for char in string:
+            if char.isdigit():
+                number_buffer += char
+            else:
+                if number_buffer:
+                    numbers_found.append(int(number_buffer))
+                    number_buffer = ""
+        return numbers_found
+
+    try:
+        for filename in os.listdir(directory):
+            if numbers_in_string(filename)[0] == count:
+                return os.path.join(directory, filename)
+    except FileNotFoundError:
+        print(f"[ОШИБКА] Директория '{directory}' не существует.")
+        return None
+    except Exception as e:
+        print(f"[ОШИБКА] Ошибка при поиске в директории '{directory}': {e}")
+        return None
+    return None
+
 def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
     """
     Organizes files into TOPICS and HOMEWORK subfolders if they are currently in the same folder.
