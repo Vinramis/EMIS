@@ -17,7 +17,6 @@ def next_col(col):
 def get_cell_value(data: pd.DataFrame, cell_ref: str):
     """Gets cell value from DataFrame by reference (e.g., 'A1')."""
     col = ''.join(filter(str.isalpha, cell_ref)).upper()
-    # Excel rows are 1-indexed, pandas .iat is 0-indexed
     try:
         row_digits = ''.join(filter(str.isdigit, cell_ref))
         if not row_digits:
@@ -51,7 +50,6 @@ def generate_sequence(data: pd.DataFrame, start_cell: str, mode: str) -> list:
         cell_ref = f"{current_col}{current_row}"
         cell_value = get_cell_value(data, cell_ref)
 
-        # Check if cell is effectively empty
         is_empty = pd.isna(cell_value) or len(str(cell_value).strip()) < 2
 
         if is_empty:
@@ -60,13 +58,12 @@ def generate_sequence(data: pd.DataFrame, start_cell: str, mode: str) -> list:
             empty_cell_counter = 0
             sequence.append(cell_ref)
 
-        # Move to next cell
         if mode == "col":
             current_row += 1
         elif mode == "row":
             current_col = next_col(current_col)
         else:
-            break # Should not happen with valid config
+            break
 
     return sequence
 
@@ -78,5 +75,5 @@ def read_topics_from_excel(file_path: str, start_cell: str, mode: str) -> list[s
         values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
         return values
     except Exception as e:
-        print(f"[ERROR] Reading Excel file: {e}")
+        print(f"[ОШИБКА] Чтение файла Excel: {e}")
         return []

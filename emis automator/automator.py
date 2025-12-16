@@ -3,34 +3,32 @@ import time
 import sys
 from playwright.sync_api import sync_playwright
 
-# Import local modules
 try:
     from config_manager import ConfigManager
     import file_utils
     import excel_utils
 except ImportError as e:
-    print(f"[CRITICAL ERROR] Could not import modules: {e}")
-    print("Ensure config_manager.py, file_utils.py, and excel_utils.py are in the same directory.")
+    print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось импортировать модули: {e}")
+    print("Убедитесь, что config_manager.py, file_utils.py и excel_utils.py находятся в одной директории.")
     sys.exit(1)
 
 def run_automation():
-    # 1. Load Configuration
+    # 1. Загрузка конфигурации
     cfg = ConfigManager()
 
-    # 2. File Organization
-    # Updates TOPICS_FOLDER and HOMEWORK_FOLDER if they were effectively split
+    # 2. Организация файлов
     cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER = file_utils.organize_files(cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER)
 
-    # 3. Browser Automation
+    # 3. Автоматизация браузера
     with sync_playwright() as p:
         browser = p.webkit.launch(headless=False)
         page = browser.new_page()
 
-        print(f"Navigating to login page...")
+        print(f"Переход на страницу входа...")
         page.goto(cfg.ONE_ID_LOGIN_URL)
 
-        # Login
-        print("Logging in...")
+        # Вход
+        print("Выполняется вход...")
         try:
             page.locator(cfg.ONE_ID_BUTTON_SELECTOR).click()
             page.get_by_placeholder(cfg.LOGIN_FIELD_PLACEHOLDER).fill(cfg.LOGIN)
@@ -39,106 +37,96 @@ def run_automation():
             page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
             
             page.wait_for_url(cfg.SUCCESS_URL)
-            print("Login successful!")
+            print("Вход выполнен успешно!")
         except Exception as e:
-            print(f"[ERROR] Login failed: {e}")
+            print(f"[ОШИБКА] Вход не удался: {e}")
             return
 
-        # 4. Prepare Data
-        print("Preparing data from Excel...")
+        # 4. Подготовка данных
+        print("Подготовка данных из Excel...")
         topic_names = excel_utils.read_topics_from_excel(
             cfg.TOPICS_FILE_PATH, 
             cfg.START_CELL, 
             cfg.MODE
         )
-        print(f"Extracted {len(topic_names)} records from Excel.")
+        print(f"Извлечено {len(topic_names)} записей из Excel.")
 
-        # 5. Automation Loop
-        print("Starting automation... \n(?) Press Ctrl+C in terminal to stop.")
+        # 5. Цикл автоматизации
+        print("Запуск автоматизации... \n(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
         page.goto(cfg.NEW_TOPIC_URL)
 
         if cfg.LINE_COUNT < cfg.START_FROM_LINE:
-            print(f"[CRITICAL ERROR] Line count ({cfg.LINE_COUNT}) is less than start line ({cfg.START_FROM_LINE}).")
+            print(f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE}).")
             return
 
         actual_length = min(cfg.LINE_COUNT, len(topic_names))
-        # Adjust logic to match original counter behavior
-        # Original: for i in range(START_FROM_LINE - 1, actual_length): ... counter += 1
-        # It used a separate counter variable for the UI logic
         
         counter = -1
         
         for i in range(cfg.START_FROM_LINE - 1, actual_length):
             counter += 1
-            print(f"\n--- Processing line {i + 1} of {actual_length} ---")
+            print(f"\n--- Обработка строки {i + 1} из {actual_length} ---")
 
             topic_name = topic_names[i]
-            # check_for matches the index (1-based)
             check_for = str(i + 1)
 
-            # Find files
+            # Поиск файлов
             topic_file_path = file_utils.find_file_by_prefix(cfg.TOPICS_FOLDER, check_for)
             homework_file_path = file_utils.find_file_by_prefix(cfg.HOMEWORK_FOLDER, check_for)
 
             if not topic_file_path: 
-                print(f"   - Topic file missing in '{cfg.TOPICS_FOLDER}'")
+                print(f"   - Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
             if not homework_file_path: 
-                print(f"   - Homework file missing in '{cfg.HOMEWORK_FOLDER}'")
+                print(f"   - Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
 
             try:
-                print("Clicking 'Add Line'...")
+                print("Нажатие 'Добавить строку'...")
                 page.locator(cfg.ADD_LINE_BUTTON).click()
-                time.sleep(0.01) # Small delay as in original
+                time.sleep(0.01)
 
                 if not topic_name:
-                    print("[CRITICAL ERROR] Topic name is undefined.")
+                    print("[КРИТИЧЕСКАЯ ОШИБКА] Имя темы не определено.")
                     sys.exit(1)
 
-                print(f"Filling topic name: '{topic_name}'")
-                # Selector logic from original: "#topics_{1000+counter}_name"
-                # Using constants from config
+                print(f"Заполнение названия темы: '{topic_name}'")
                 page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.TOPIC_NAME_SUFFIX}").fill(topic_name)
 
                 if topic_file_path:
-                    print(f"Uploading topic file: {topic_file_path}")
+                    print(f"Загрузка файла темы: {topic_file_path}")
                     page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.TOPIC_FILE_SUFFIX}").set_input_files(topic_file_path)
 
                 if homework_file_path:
-                    print(f"Uploading homework file: {homework_file_path}")
+                    print(f"Загрузка файла домашнего задания: {homework_file_path}")
                     page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.HOMEWORK_FILE_SUFFIX}").set_input_files(homework_file_path)
 
             except Exception as e:
-                print(f"[CRITICAL ERROR] at line {counter + 1} (Process item {i+1}): {e}")
-                print("Saving error screenshot.")
+                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {i+1}): {e}")
+                print("Сохранение скриншота ошибки.")
                 page.screenshot(path="error_screenshot.png")
                 break
 
-        print("\n--- Automation Complete! ---")
-        print("\n\n\n(?) You can now interact with the browser. Script will exit when browser is closed.\n\n\n")
+        print("\n--- Автоматизация завершена! ---")
+        print("\n\n\n(?) Теперь вы можете взаимодействовать с браузером. Скрипт завершится после закрытия браузера.\n\n\n")
 
-        # Wait for user to close browser
+        # Ожидание закрытия браузера пользователем
         while True:
             try:
                 if page.is_closed():
                     break
                 page.wait_for_event("close", timeout=1000)
             except Exception:
-                # Timeout or other issue, check if closed
                 if page.is_closed():
                     break
                 continue
         
-        print("Browser closed. Exiting script.\n")
+        print("Браузер закрыт. Завершение скрипта.\n")
         time.sleep(1)
 
 if __name__ == "__main__":
     try:
         run_automation()
     except KeyboardInterrupt:
-        print("\nStopped by user.")
+        print("\nОстановлено пользователем.")
     except Exception as e:
-        print(f"[CRITICAL ERROR] Unhandled exception: {e}")
-        # Keep window open if crashed so user sees error?
-        # Only if NOT run from unexpected environment. 
-        # Original had time.sleep(999999)
+        print(f"[КРИТИЧЕСКАЯ ОШИБКА] Необработанное исключение: {e}")
         time.sleep(10)

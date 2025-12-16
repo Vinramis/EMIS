@@ -1,6 +1,6 @@
 
 import json
-import os
+# import os
 import sys
 
 class ConfigManager:
@@ -9,7 +9,7 @@ class ConfigManager:
             with open(config_path, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
         except FileNotFoundError:
-            print(f"Config file not found at {config_path}")
+            print(f"Файл конфигурации не найден по пути {config_path}")
             sys.exit(1)
 
         # Credentials
@@ -40,6 +40,3 @@ class ConfigManager:
         self.TOPIC_FILE_SUFFIX = "_topic_file"
         self.HOMEWORK_FILE_SUFFIX = "_homework_file"
         self.ADD_LINE_BUTTON = ".Full"
-
-# Create a global instance/singleton-like usage if needed, 
-# or letting main script instantiate it. 
