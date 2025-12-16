@@ -71,7 +71,7 @@ echo.
 echo --- Параметры автоматизации (нажмите ENTER для значений по умолчанию) ---
 echo (?) Значения по умолчанию будут показаны в квадратных скобках.
 echo.
-set DEFAULT_LINE_COUNT=100
+set DEFAULT_LINE_COUNT=3
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
 set DEFAULT_START_FROM_LINE=1
