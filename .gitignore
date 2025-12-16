@@ -1,8 +1,10 @@
 .vscode
 __pycache__
+publication variants
+test.cmd
+test.py
 emis automator/ДЗ
 emis automator/КЛ
 emis automator/config.json
 emis automator/КТП.xlsx
-test.cmd
-test.py
+smart clipboard/data.xlsx
