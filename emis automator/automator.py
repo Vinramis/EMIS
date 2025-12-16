@@ -221,7 +221,7 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         #     exit(0)
 
     with sync_playwright() as p:
-        browser = p.webkit.launch(headless=False)  # Установите True для запуска в фоновом режиме.
+        browser = p.chromium.launch(headless=False)  # Установите True для запуска в фоновом режиме.
         page = browser.new_page()
 
         print(f"Переход на страницу входа...")
@@ -243,10 +243,15 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         # --- Подготовка данных ---
         print("Подготовка данных из Excel...")
         df = pd.read_excel(TOPICS_FILE_PATH, header=None)
+        print("here 1")
         start_cell = START_CELL
+        print("here 2")
         mode = MODE
+        print("here 3")
         cell_sequence = generate_sequence(df, start_cell, mode)
+        print("here 4")
         values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
+        print("here 5")
         print(f"Извлечено {len(values)} записей из Excel.")
         
         # print(HOMEWORK_FOLDER, TOPICS_FOLDER)

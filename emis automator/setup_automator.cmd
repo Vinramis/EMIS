@@ -38,7 +38,6 @@ echo.
 echo --- Учетные данные ---
 set /p "LOGIN=Введите ваш логин EMIS: "
 set /p "PASSWORD=Введите ваш пароль EMIS: "
-echo.
 goto :GATHER_SETTINGS
 
 :RECONFIGURE
@@ -65,12 +64,12 @@ set /p "LOGIN=Логин [!EXISTING_LOGIN!]: "
 set /p "PASSWORD=Пароль [!EXISTING_PASSWORD!]: "
 if not defined LOGIN set LOGIN=!EXISTING_LOGIN!
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
-echo.
 
 :GATHER_SETTINGS
+echo.
+echo.
 echo --- Параметры автоматизации (нажмите ENTER для значений по умолчанию) ---
 echo (?) Значения по умолчанию будут показаны в квадратных скобках.
-echo.
 set DEFAULT_LINE_COUNT=3
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
@@ -99,8 +98,8 @@ set /p "LINE_COUNT=На какой теме закончить обработк�
 if not defined LINE_COUNT set "LINE_COUNT=%DEFAULT_LINE_COUNT%"
 
 
-echo.
-:GET_MODE
+@REM echo.
+@REM :GET_MODE
 @REM DEPRECATED 
 @REM set "MODE_INPUT="
 @REM @REM echo Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]:
@@ -110,7 +109,7 @@ echo.
 @REM ) else (
 @REM     set "MODE=!DEFAULT_MODE!"
 @REM )
-set "MODE_INPUT=%DEFAULT_MODE%"
+set "MODE=%DEFAULT_MODE%"
 
 echo.
 echo.
