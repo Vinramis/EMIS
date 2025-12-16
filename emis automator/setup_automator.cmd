@@ -161,9 +161,9 @@ echo.
 echo.
 echo ---------------------------------------------------
 echo (?) Необходимо при первом запуске установить библиотки и зависимости.
-set "library_install="
+set "library_install=0"
 set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
-if not defined library_install set "library_install=n"
+@REM if not defined library_install set "library_install=n"
 if "!library_install!"=="1" (
     winget install Python >nul 2>&1
     python -m pip install playwright pandas >nul 2>&1
