@@ -63,16 +63,15 @@ def run_automation():
         
         counter = -1
         
-        for i in range(cfg.START_FROM_LINE - 1, actual_length):
+        for topic_number in range(cfg.START_FROM_LINE, actual_length + 1):
             counter += 1
-            print(f"\n--- Обработка строки {i + 1} из {actual_length} ---")
+            print(f"\n--- Обработка строки {topic_number} из {actual_length} ---")
 
-            topic_name = topic_names[i]
-            check_for = str(i + 1)
+            topic_name = topic_names[topic_number - 1]
 
             # Поиск файлов
-            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, check_for)
-            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, check_for)
+            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, topic_number)
+            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, topic_number)
 
             if not topic_file_path: 
                 print(f"[ОШИБКА] Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
@@ -100,7 +99,7 @@ def run_automation():
                     page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.HOMEWORK_FILE_SUFFIX}").set_input_files(homework_file_path)
 
             except Exception as e:
-                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {i+1}): {e}")
+                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {topic_number}): {e}")
                 print("Сохранение скриншота ошибки.")
                 page.screenshot(path="error_screenshot.png")
                 break
