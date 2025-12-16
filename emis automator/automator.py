@@ -221,7 +221,7 @@ def run_automation(TOPICS_FOLDER=TOPICS_FOLDER, HOMEWORK_FOLDER=HOMEWORK_FOLDER)
         #     exit(0)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # Установите True для запуска в фоновом режиме.
+        browser = p.webkit.launch(headless=False)  # Установите True для запуска в фоновом режиме.
         page = browser.new_page()
 
         print(f"Переход на страницу входа...")
