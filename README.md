@@ -1,3 +1,3 @@
 # EMIS
 
-readme edited
+Sorry, seems like README isn't ready for reading yet
