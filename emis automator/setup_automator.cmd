@@ -165,7 +165,6 @@ echo.
 :: --- Install/Check Dependencies ---
 echo.
 echo ---------------------------------------------------
-echo Установка библиотек и зависимостей...
 echo (?) Необходимо при первом запуске.
 set "library_install=0"
 set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
@@ -178,6 +177,8 @@ if "!library_install!"=="1" (
     @REM playwright install >nul 2>&1
     @REM pip install openpyxl >nul 2>&1
 
+    echo Установка библиотек и зависимостей...
+    echo (?) На это может потребоваться некоторое время.
 
     :: Install Python
     winget install Python --silent --accept-source-agreements >nul 2>&1
