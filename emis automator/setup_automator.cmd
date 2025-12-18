@@ -13,12 +13,52 @@ echo.
 echo.
 
 
+:: --- Check for dependencies ---
+TIMEOUT /T 1 >nul 2>&1
+echo Проверка компонентов...
+set "COMPONENT_NOT_INSTALLED=false"
+
+python --version >nul 2>&1
+if errorlevel 1 (
+    set "COMPONENT_NOT_INSTALLED=true"
+    dependencies_installer.cmd
+    TIMEOUT /T 3 >nul 2>&1
+)
+
+python -c "import playwright" >nul 2>&1
+if errorlevel 1 (
+    set "COMPONENT_NOT_INSTALLED=true"
+    dependencies_installer.cmd
+)
+
+python -c "import pandas" >nul 2>&1
+if errorlevel 1 (
+    set "COMPONENT_NOT_INSTALLED=true"
+    dependencies_installer.cmd
+)
+
+python -c "import openpyxl" >nul 2>&1
+if errorlevel 1 (
+    set "COMPONENT_NOT_INSTALLED=true"
+    dependencies_installer.cmd
+)
+
+if "!COMPONENT_NOT_INSTALLED!"=="true" (
+    TIMEOUT /T 3 >nul 2>&1
+) else (
+    echo Все компоненты уже установлены, ура
+)
+
+
 :: --- Check for existing config file ---
 TIMEOUT /T 1 >nul 2>&1
+echo.
 if exist "config.json" (
-    echo [ИНФО] Найден существующий файл 'config.json'.
+    @REM echo.
+    @REM echo [ИНФО] Найден существующий файл 'config.json'.
+    @REM echo.
     set "USE_EXISTING="
-    set /p "USE_EXISTING=Вы хотите использовать эту конфигурацию? (введите 1 для нет, пропуск для да): "
+    set /p "USE_EXISTING=Вы хотите использовать текущую конфигурацию? (введите 1 для нет, пропуск для да): "
     
     if "!USE_EXISTING!"=="1" (
         echo.
@@ -29,41 +69,37 @@ if exist "config.json" (
         echo Используется существующая конфигурация.
         goto :LAUNCH_AUTOMATOR
     )
+) else (
+    @REM echo.
+    @REM echo [ИНФО] Файл 'config.json' не найден. Запуск первоначальной настройки.
+    @REM echo.
+
+    @REM :CREATE_NEW_CONFIG
+    echo --- Учетные данные ---
+    TIMEOUT /T 1 >nul 2>&1
+    set /p "LOGIN=Введите ваш логин EMIS: "
+
+    TIMEOUT /T 1 >nul 2>&1
+    set /p "PASSWORD=Введите ваш пароль EMIS: "
 )
-
-echo.
-echo [ИНФО] Файл 'config.json' не найден. Запуск первоначальной настройки.
-echo.
-
-:CREATE_NEW_CONFIG
-echo --- Учетные данные ---
-TIMEOUT /T 1 >nul 2>&1
-set /p "LOGIN=Введите ваш логин EMIS: "
-
-TIMEOUT /T 1 >nul 2>&1
-set /p "PASSWORD=Введите ваш пароль EMIS: "
 
 goto :GATHER_SETTINGS
 
 :RECONFIGURE
-echo --- Учетные данные (оставьте пустым и нажмите Enter, чтобы сохранить существующие) ---
-echo (?) Существующие учетные данные будут показаны в квадратных скобках.
+echo.
+echo.
+echo --- Учетные данные ---
+echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить существующие
+echo (?) Существующие учетные данные будут в квадратных скобках
 :: Try to parse existing credentials to use as defaults
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"login\"" "config.json"') do set "EXISTING_LOGIN=%%~a"
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"password\"" "config.json"') do set "EXISTING_PASSWORD=%%~a"
 :: Remove quotes
 set "EXISTING_LOGIN=!EXISTING_LOGIN:"=!"
 set "EXISTING_PASSWORD=!EXISTING_PASSWORD:"=!"
-:: Test output
-@REM echo Existing login: '!EXISTING_LOGIN!'
-@REM echo Existing password: '!EXISTING_PASSWORD!'
 :: Remove leading spaces
 set "EXISTING_LOGIN=!EXISTING_LOGIN:~1!"
 set "EXISTING_PASSWORD=!EXISTING_PASSWORD:~1!"
-:: test output
-@REM echo Existing login: '!EXISTING_LOGIN!'
-@REM echo Existing password: '!EXISTING_PASSWORD!'
-
 
 set /p "LOGIN=Логин [!EXISTING_LOGIN!]: "
 TIMEOUT /T 1 >nul 2>&1
@@ -75,8 +111,9 @@ if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 :GATHER_SETTINGS
 echo.
 echo.
-echo --- Параметры автоматизации (оставьте пустым и нажмите Enter для значений по умолчанию) ---
-echo (?) Значения по умолчанию будут показаны в квадратных скобках.
+echo --- Параметры автоматизации ---
+echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
+echo (?) Значения по умолчанию будут в квадратных скобках
 set DEFAULT_LINE_COUNT=6
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
@@ -162,7 +199,7 @@ echo Создание файла 'config.json'...
 ) > tmp_config.json
 
 :: Add credentials to the JSON file
-python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)"
+python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul 2>&1
 del tmp_config.json
 
 echo Файл 'config.json' успешно создан.
@@ -249,5 +286,5 @@ python automator.py
 :: Closing window
 echo.
 echo.
-echo Нажмите любую клавишу для выхода...
+echo Кажется, браузер был закрыт. Нажмите любую клавишу для выхода...
 pause >nul

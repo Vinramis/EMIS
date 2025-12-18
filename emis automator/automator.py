@@ -105,7 +105,7 @@ def run_automation():
                 break
 
         print("\n--- Автоматизация завершена! ---")
-        print("\n\n\n(?) Теперь вы можете взаимодействовать с браузером. Скрипт завершится после закрытия браузера.\n\n\n")
+        print("\n\n(?) Теперь вы можете взаимодействовать с браузером. Не закрывайте это окно!\n\n")
 
         # Ожидание закрытия браузера пользователем
         while True:
@@ -118,14 +118,14 @@ def run_automation():
                     break
                 continue
         
-        print("Браузер закрыт. Завершение скрипта.\n")
+        # print("Браузер закрыт. Завершение скрипта.\n")
         time.sleep(1)
 
 if __name__ == "__main__":
     try:
         run_automation()
-    except KeyboardInterrupt:
-        print("\nОстановлено пользователем.")
+    # except KeyboardInterrupt:
+    #     print("\nОстановлено пользователем.")
     except Exception as e:
         print(f"[КРИТИЧЕСКАЯ ОШИБКА] Необработанное исключение: {e}")
         time.sleep(10)
