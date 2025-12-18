@@ -1,4 +1,3 @@
-
 import time
 import sys
 
@@ -38,7 +37,6 @@ def run_automation():
             time.sleep(0.2)
             page.get_by_placeholder(cfg.PASSWORD_FIELD_PLACEHOLDER).fill(cfg.PASSWORD)
             time.sleep(0.2)
-            # Click the login button
             page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
             time.sleep(0.2)
             page.wait_for_url(cfg.SUCCESS_URL)
@@ -50,26 +48,24 @@ def run_automation():
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
         topic_names = excel_utils.read_topics_from_excel(
-            cfg.TOPICS_FILE_PATH, 
-            cfg.START_CELL, 
-            cfg.MODE
+            cfg.TOPICS_FILE_PATH, cfg.START_CELL, cfg.MODE
         )
         print(f"Извлечено {len(topic_names)} записей из Excel.")
 
         # 5. Цикл автоматизации
         print("Запуск автоматизации...")
-        print("(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
-        time.sleep(3)
+        time.sleep(1)
         page.goto(cfg.NEW_TOPIC_URL)
 
         if cfg.LINE_COUNT < cfg.START_FROM_LINE:
-            print(f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE}).")
+            print(
+                f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE})."
+            )
             return
 
         actual_length = min(cfg.LINE_COUNT, len(topic_names))
-        
         counter = -1
-        
+
         for topic_number in range(cfg.START_FROM_LINE, actual_length + 1):
             counter += 1
             print(f"\n--- Обработка строки {topic_number} из {actual_length} ---")
@@ -80,9 +76,9 @@ def run_automation():
             topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, topic_number)
             homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, topic_number)
 
-            if not topic_file_path: 
+            if not topic_file_path:
                 print(f"[ОШИБКА] Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
-            if not homework_file_path: 
+            if not homework_file_path:
                 print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
 
             try:
@@ -124,15 +120,15 @@ def run_automation():
                 if page.is_closed():
                     break
                 continue
-        
-        # print("Браузер закрыт. Завершение скрипта.\n")
+
         time.sleep(1)
 
 if __name__ == "__main__":
     try:
         run_automation()
-    # except KeyboardInterrupt:
-    #     print("\nОстановлено пользователем.")
+    except KeyboardInterrupt:
+        print("\n\nВы остановили программу. Можно закрыть это окно.\n\n")
+        time.sleep(999)
     except Exception as e:
         print(f"[КРИТИЧЕСКАЯ ОШИБКА] Необработанное исключение: {e}")
-        time.sleep(10)
+        time.sleep(1)
