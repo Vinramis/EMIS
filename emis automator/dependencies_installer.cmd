@@ -36,7 +36,7 @@ TIMEOUT /T 1 >nul 2>&1
 :: Install WebKit engine
 echo.
 echo [ИНФО] Устанавливаем зависимости...
-echo (?) Это обычно самый долгий процесс, не закрывайте окно
+echo (?) Это обычно самый долгий процесс, пожалуйста, не закрывайте окно
 python -m playwright install webkit >nul 2>&1
 echo [ИНФО] Зависимости установлены.
 TIMEOUT /T 1 >nul 2>&1

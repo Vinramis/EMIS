@@ -15,66 +15,61 @@ echo.
 
 :: --- Check for dependencies ---
 TIMEOUT /T 1 >nul 2>&1
+echo ---------------------------------------------------
 echo Проверка компонентов...
-set "COMPONENT_NOT_INSTALLED=false"
+set "COMPONENT_WAS_NOT_INSTALLED=false"
 
 python --version >nul 2>&1
 if errorlevel 1 (
-    set "COMPONENT_NOT_INSTALLED=true"
+    set "COMPONENT_WAS_NOT_INSTALLED=true"
     dependencies_installer.cmd
     TIMEOUT /T 3 >nul 2>&1
 )
 
 python -c "import playwright" >nul 2>&1
 if errorlevel 1 (
-    set "COMPONENT_NOT_INSTALLED=true"
+    set "COMPONENT_WAS_NOT_INSTALLED=true"
     dependencies_installer.cmd
 )
 
 python -c "import pandas" >nul 2>&1
 if errorlevel 1 (
-    set "COMPONENT_NOT_INSTALLED=true"
+    set "COMPONENT_WAS_NOT_INSTALLED=true"
     dependencies_installer.cmd
 )
 
 python -c "import openpyxl" >nul 2>&1
 if errorlevel 1 (
-    set "COMPONENT_NOT_INSTALLED=true"
+    set "COMPONENT_WAS_NOT_INSTALLED=true"
     dependencies_installer.cmd
 )
 
-if "!COMPONENT_NOT_INSTALLED!"=="true" (
+if "!COMPONENT_WAS_NOT_INSTALLED!"=="true" (
     TIMEOUT /T 3 >nul 2>&1
+    echo.
+    echo Компоненты установлены успешно
 ) else (
-    echo Все компоненты уже установлены, ура
+    echo Все компоненты уже были установлены, ура
 )
 
 
 :: --- Check for existing config file ---
 TIMEOUT /T 1 >nul 2>&1
 echo.
+echo ---------------------------------------------------
+echo Проверка конфигурации...
 if exist "config.json" (
-    @REM echo.
-    @REM echo [ИНФО] Найден существующий файл 'config.json'.
-    @REM echo.
     set "USE_EXISTING="
-    set /p "USE_EXISTING=Вы хотите использовать текущую конфигурацию? (введите 1 для нет, пропуск для да): "
+    set /p "USE_EXISTING=Конфигурация уже существует, использовать её? (введите 1 для нет, пропуск для да): "
     
     if "!USE_EXISTING!"=="1" (
-        echo.
         echo Перенастройка параметров...
         goto :RECONFIGURE
     ) else (
-        echo.
         echo Используется существующая конфигурация.
         goto :LAUNCH_AUTOMATOR
     )
 ) else (
-    @REM echo.
-    @REM echo [ИНФО] Файл 'config.json' не найден. Запуск первоначальной настройки.
-    @REM echo.
-
-    @REM :CREATE_NEW_CONFIG
     echo --- Учетные данные ---
     TIMEOUT /T 1 >nul 2>&1
     set /p "LOGIN=Введите ваш логин EMIS: "
@@ -82,15 +77,16 @@ if exist "config.json" (
     TIMEOUT /T 1 >nul 2>&1
     set /p "PASSWORD=Введите ваш пароль EMIS: "
 )
-
 goto :GATHER_SETTINGS
 
+
 :RECONFIGURE
-echo.
 echo.
 echo --- Учетные данные ---
 echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить существующие
 echo (?) Существующие учетные данные будут в квадратных скобках
+echo.
+
 :: Try to parse existing credentials to use as defaults
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"login\"" "config.json"') do set "EXISTING_LOGIN=%%~a"
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"password\"" "config.json"') do set "EXISTING_PASSWORD=%%~a"
@@ -101,11 +97,11 @@ set "EXISTING_PASSWORD=!EXISTING_PASSWORD:"=!"
 set "EXISTING_LOGIN=!EXISTING_LOGIN:~1!"
 set "EXISTING_PASSWORD=!EXISTING_PASSWORD:~1!"
 
-set /p "LOGIN=Логин [!EXISTING_LOGIN!]: "
+set /p "LOGIN=Введите ваш логин EMIS [!EXISTING_LOGIN!]: "
 TIMEOUT /T 1 >nul 2>&1
-set /p "PASSWORD=Пароль [!EXISTING_PASSWORD!]: "
+set /p "PASSWORD=Введите ваш пароль EMIS [!EXISTING_PASSWORD!]: "
 TIMEOUT /T 1 >nul 2>&1
-if not defined LOGIN set LOGIN=!EXISTING_LOGIN!
+if not defined LOGIN set "LOGIN=!EXISTING_LOGIN!"
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 
 :GATHER_SETTINGS
@@ -114,6 +110,8 @@ echo.
 echo --- Параметры автоматизации ---
 echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
 echo (?) Значения по умолчанию будут в квадратных скобках
+echo.
+
 set DEFAULT_LINE_COUNT=6
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
@@ -122,18 +120,15 @@ set "DEFAULT_MODE=col"
 set "DEFAULT_TOPICS_FOLDER=КЛ"
 set "DEFAULT_HOMEWORK_FOLDER=ДЗ"
 
-@REM DEPRECATED
-@REM echo.
 set "TOPICS_FILE_PATH="
+@REM DEPRECATED
 @REM set /p "TOPICS_FILE_PATH=Введите путь к файлу Excel с темами [%DEFAULT_TOPICS_FILE_PATH%]: "
 if not defined TOPICS_FILE_PATH set "TOPICS_FILE_PATH=%DEFAULT_TOPICS_FILE_PATH%"
 
-echo.
 set "START_CELL="
 set /p "START_CELL=Введите начальную ячейку в файле Excel [%DEFAULT_START_CELL%]: "
 if not defined START_CELL set "START_CELL=%DEFAULT_START_CELL%"
 
-echo.
 set "START_FROM_LINE="
 set /p "START_FROM_LINE=С какой темы начать обработку (номером) [%DEFAULT_START_FROM_LINE%]: "
 if not defined START_FROM_LINE set "START_FROM_LINE=%DEFAULT_START_FROM_LINE%"
@@ -182,7 +177,7 @@ set "JSON_HOMEWORK_FOLDER=!HOMEWORK_FOLDER:\=\\!"
 :: --- Create config.json ---
 echo.
 echo ---------------------------------------------------
-echo Создание файла 'config.json'...
+echo Сохранение конфигурации...
 
 (
     echo {
@@ -202,12 +197,14 @@ echo Создание файла 'config.json'...
 python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul 2>&1
 del tmp_config.json
 
-echo Файл 'config.json' успешно создан.
+echo Конфигурация успешно сохранена.
 echo.
 
 
 
 @REM WAS PUT INTO SEPARATE SCRIPT
+
+
 @REM :INSTALL_DEPS
 @REM :: --- Install/Check Dependencies ---
 @REM echo.
@@ -276,8 +273,8 @@ echo.
 :LAUNCH_AUTOMATOR
 :: --- Launch Automator ---
 echo ---------------------------------------------------
+echo Настройка завершена. Запускаем автоматизатор...
 echo.
-echo Настройка завершена! Запускаем автоматизатор...
 echo.
 
 TIMEOUT /T 1 >nul 2>&1

@@ -24,18 +24,22 @@ def run_automation():
         browser = p.webkit.launch(headless=False)
         page = browser.new_page()
 
-        print(f"Переход на страницу входа...")
+        print("Переход на страницу входа...")
         page.goto(cfg.ONE_ID_LOGIN_URL)
 
         # Вход
         print("Выполняется вход...")
         try:
             page.locator(cfg.ONE_ID_BUTTON_SELECTOR).click()
+            time.sleep(0.2)
             page.get_by_placeholder(cfg.LOGIN_FIELD_PLACEHOLDER).fill(cfg.LOGIN)
+            time.sleep(0.2)
             page.get_by_placeholder(cfg.PASSWORD_FIELD_PLACEHOLDER).fill(cfg.PASSWORD)
-            # Click the first matching login button
+            time.sleep(0.2)
+            # Click the login button
+            time.sleep(0.2)
             page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
-            
+            time.sleep(0.2)
             page.wait_for_url(cfg.SUCCESS_URL)
             print("Вход выполнен успешно!")
         except Exception as e:
