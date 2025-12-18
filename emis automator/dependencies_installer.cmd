@@ -17,6 +17,7 @@ echo.
 echo [ИНФО] Устанавливаем Python...
 python_installer.exe /passive InstallAllUsers=0 PrependPath=1 >nul 2>&1
 echo [ИНФО] Python установлен.
+echo.
 goto :CLOSE_WINDOW
 
 
@@ -33,6 +34,7 @@ echo [ИНФО] Устанавливаем зависимости...
 echo (?) Это обычно самый долгий процесс, пожалуйста, не закрывайте окно
 python -m playwright install webkit >nul 2>&1
 echo [ИНФО] Зависимости установлены.
+echo.
 TIMEOUT /T 1 >nul 2>&1
 
 
