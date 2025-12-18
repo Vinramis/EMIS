@@ -10,11 +10,11 @@ echo.
 echo Этот скрипт поможет настроить параметры для автоматизации, затем запустит её
 echo.
 echo.
-echo.
 
 
 :: --- Check for dependencies ---
 TIMEOUT /T 1 >nul 2>&1
+echo.
 echo ---------------------------------------------------
 echo Проверка компонентов...
 set "COMPONENT_WAS_NOT_INSTALLED=false"
@@ -61,6 +61,7 @@ echo Проверка конфигурации...
 if exist "config.json" (
     set "USE_EXISTING="
     set /p "USE_EXISTING=Конфигурация уже существует, использовать её? (введите 1 для нет, пропуск для да): "
+    TIMEOUT /T 1 >nul 2>&1
     
     if "!USE_EXISTING!"=="1" (
         echo Перенастройка параметров...
