@@ -1,15 +1,15 @@
 
 import time
 import sys
-from playwright.sync_api import sync_playwright
 
 try:
+    from playwright.sync_api import sync_playwright
     from config_manager import ConfigManager
     import file_utils
     import excel_utils
 except ImportError as e:
     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось импортировать модули: {e}")
-    print("Убедитесь, что config_manager.py, file_utils.py и excel_utils.py находятся в одной директории.")
+    print("(?) Кажется, вы запустили программу неправильно. Попробуйте заново.")
     sys.exit(1)
 
 def run_automation():

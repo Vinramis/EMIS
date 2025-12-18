@@ -14,6 +14,7 @@ echo.
 
 
 :: --- Check for existing config file ---
+TIMEOUT /T 1 >nul 2>&1
 if exist "config.json" (
     echo [ИНФО] Найден существующий файл 'config.json'.
     set "USE_EXISTING="
@@ -26,7 +27,7 @@ if exist "config.json" (
     ) else (
         echo.
         echo Используется существующая конфигурация.
-        goto :INSTALL_DEPS
+        goto :LAUNCH_AUTOMATOR
     )
 )
 
@@ -36,8 +37,12 @@ echo.
 
 :CREATE_NEW_CONFIG
 echo --- Учетные данные ---
+TIMEOUT /T 1 >nul 2>&1
 set /p "LOGIN=Введите ваш логин EMIS: "
+
+TIMEOUT /T 1 >nul 2>&1
 set /p "PASSWORD=Введите ваш пароль EMIS: "
+
 goto :GATHER_SETTINGS
 
 :RECONFIGURE
@@ -61,7 +66,9 @@ set "EXISTING_PASSWORD=!EXISTING_PASSWORD:~1!"
 
 
 set /p "LOGIN=Логин [!EXISTING_LOGIN!]: "
+TIMEOUT /T 1 >nul 2>&1
 set /p "PASSWORD=Пароль [!EXISTING_PASSWORD!]: "
+TIMEOUT /T 1 >nul 2>&1
 if not defined LOGIN set LOGIN=!EXISTING_LOGIN!
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 
@@ -161,36 +168,58 @@ del tmp_config.json
 echo Файл 'config.json' успешно создан.
 echo.
 
-:INSTALL_DEPS
-:: --- Install/Check Dependencies ---
-echo.
-echo ---------------------------------------------------
-echo (?) Необходимо при первом запуске.
-set "library_install=0"
-set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
-@REM if not defined library_install set "library_install=n"
-if "!library_install!"=="1" (
-    @REM winget install Python >nul 2>&1
-    @REM python -m pip install playwright pandas openpyxl >nul 2>&1
-    @REM python -m playwright install >nul 2>&1
-    @REM pip install playwright >nul 2>&1
-    @REM playwright install >nul 2>&1
-    @REM pip install openpyxl >nul 2>&1
 
-    echo Установка библиотек и зависимостей...
-    echo (?) На это может потребоваться некоторое время.
 
-    :: Install Python
-    winget install Python --silent --accept-source-agreements >nul 2>&1
+@REM WAS PUT INTO SEPARATE SCRIPT
+@REM :INSTALL_DEPS
+@REM :: --- Install/Check Dependencies ---
+@REM echo.
+@REM echo ---------------------------------------------------
+@REM echo (?) Необходимо при первом запуске.
+@REM @REM set library_install="0"
+@REM @REM set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
+@REM @REM if not defined library_install set "library_install=n"
 
-    :: Install libraries
-    python -m pip install playwright pandas openpyxl >nul 2>&1
+@REM @REM echo.
+@REM set "library_install="
+@REM set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
+@REM if not defined library_install set "library_install=0"
+@REM TIMEOUT /T 1 >nul 2>&1
+@REM echo !library_install!
+@REM echo "!library_install!"=="1"
+@REM TIMEOUT /T 1 >nul 2>&1
 
-    :: Install only the Safari/WebKit engine
-    python -m playwright install webkit >nul 2>&1
+@REM if "!library_install!"=="1" (
+@REM     @REM winget install Python >nul 2>&1
+@REM     @REM python -m pip install playwright pandas openpyxl >nul 2>&1
+@REM     @REM python -m playwright install >nul 2>&1
+@REM     @REM pip install playwright >nul 2>&1
+@REM     @REM playwright install >nul 2>&1
+@REM     @REM pip install openpyxl >nul 2>&1
 
-    echo Зависимости установлены.
-)
+@REM     TIMEOUT /T 2 >nul 2>&1
+@REM     echo Установка библиотек и зависимостей...
+@REM     echo (?) На это может потребоваться некоторое время.
+
+@REM     :: Local Install Python
+@REM     @REM winget install Python --silent --accept-source-agreements >nul 2>&1 apparantly doesn't work
+@REM     python_installer.exe /passive InstallAllUsers=0 PrependPath=1 >nul 2>&1
+@REM     echo Python установлен.
+@REM     TIMEOUT /T 2 >nul 2>&1
+@REM     echo.
+
+@REM     :: Install libraries
+@REM     python -m pip install playwright pandas openpyxl >nul 2>&1
+@REM     echo Библиотеки установлены.
+@REM     TIMEOUT /T 2 >nul 2>&1
+@REM     echo.
+
+@REM     :: Install only the WebKit engine
+@REM     python -m playwright install webkit >nul 2>&1
+@REM     echo Зависимости установлены.
+@REM     TIMEOUT /T 2 >nul 2>&1
+@REM     echo.
+@REM )
 
 @REM DEPRECATED
 @REM :: Check if Python is installed
@@ -206,13 +235,19 @@ if "!library_install!"=="1" (
 @REM playwright install >nul 2>&1
 @REM pip install openpyxl >nul 2>&1
 
+
+:LAUNCH_AUTOMATOR
+:: --- Launch Automator ---
 echo ---------------------------------------------------
 echo.
 echo Настройка завершена! Запускаем автоматизатор...
 echo.
 
+TIMEOUT /T 1 >nul 2>&1
 python automator.py
 
 :: Closing window
-endlocal
-exit /b 0
+echo.
+echo.
+echo Нажмите любую клавишу для выхода...
+pause >nul
