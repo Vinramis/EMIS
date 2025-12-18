@@ -198,8 +198,6 @@ python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={
 del tmp_config.json
 
 echo Конфигурация успешно сохранена.
-echo.
-
 
 
 @REM WAS PUT INTO SEPARATE SCRIPT
@@ -272,6 +270,7 @@ echo.
 
 :LAUNCH_AUTOMATOR
 :: --- Launch Automator ---
+echo.
 echo ---------------------------------------------------
 echo Настройка завершена. Запускаем автоматизатор...
 echo.
@@ -284,4 +283,6 @@ python automator.py
 echo.
 echo.
 echo Кажется, браузер был закрыт. Нажмите любую клавишу для выхода...
+echo.
+echo.
 pause >nul

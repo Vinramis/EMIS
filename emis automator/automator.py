@@ -23,9 +23,11 @@ def run_automation():
     with sync_playwright() as p:
         browser = p.webkit.launch(headless=False)
         page = browser.new_page()
+        time.sleep(0.2)
 
         print("Переход на страницу входа...")
         page.goto(cfg.ONE_ID_LOGIN_URL)
+        time.sleep(0.2)
 
         # Вход
         print("Выполняется вход...")
