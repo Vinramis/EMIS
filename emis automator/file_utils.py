@@ -102,7 +102,7 @@ def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
             print(f"[ИНФО] Остались нераспределенные файлы в папке '{all_folder}': {unassigned}")
             print("(?) Просто разделите оставшиеся файлы вручную")
             print("(?) Или добавьте ключевые слова в имена оставшихся файлов и перезапустите скрипт.")
-            print(f"\n(?) --- Ключевые слова ---")
+            print("\n(?) --- Ключевые слова ---")
             print(f"(?) Для классных работа: {topic_keywords}")
             print(f"(?) Для домашних заданий: {homework_keywords}\n")
             time.sleep(2)
