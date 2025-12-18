@@ -2,19 +2,12 @@
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 
-TIMEOUT /T 2 >nul 2>&1
-@REM echo.
-@REM echo --- Установка библиотек и зависимостей ---
-@REM echo.
 
 :: Check if Python is installed
 python --version >nul 2>&1
 if errorlevel 1 (
-    @REM echo Этап 1. Установка программы Python.
     goto :INSTALL_PYTHON
 )
-
-@REM echo Этап 2. Установка библиотек и зависимостей.
 goto :INSTALL_DEPS
 
 
@@ -25,6 +18,7 @@ echo [ИНФО] Устанавливаем Python...
 python_installer.exe /passive InstallAllUsers=0 PrependPath=1 >nul 2>&1
 echo [ИНФО] Python установлен.
 goto :CLOSE_WINDOW
+
 
 :INSTALL_DEPS
 :: Install libraries
@@ -40,6 +34,7 @@ echo (?) Это обычно самый долгий процесс, пожал�
 python -m playwright install webkit >nul 2>&1
 echo [ИНФО] Зависимости установлены.
 TIMEOUT /T 1 >nul 2>&1
+
 
 :: Closing window
 :CLOSE_WINDOW
