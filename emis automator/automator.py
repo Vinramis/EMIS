@@ -57,7 +57,9 @@ def run_automation():
         print(f"Извлечено {len(topic_names)} записей из Excel.")
 
         # 5. Цикл автоматизации
-        print("Запуск автоматизации... \n(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
+        print("Запуск автоматизации...")
+        print("(?) Нажмите Ctrl+C в терминале, чтобы остановить.")
+        time.sleep(3)
         page.goto(cfg.NEW_TOPIC_URL)
 
         if cfg.LINE_COUNT < cfg.START_FROM_LINE:
