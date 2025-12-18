@@ -39,7 +39,6 @@ def run_automation():
             page.get_by_placeholder(cfg.PASSWORD_FIELD_PLACEHOLDER).fill(cfg.PASSWORD)
             time.sleep(0.2)
             # Click the login button
-            time.sleep(0.2)
             page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
             time.sleep(0.2)
             page.wait_for_url(cfg.SUCCESS_URL)
