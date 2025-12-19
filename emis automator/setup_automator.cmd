@@ -158,8 +158,17 @@ echo ---------------------------------------------------
 echo Настройка завершена. Запускаем автоматизатор...
 echo.
 echo.
-
 TIMEOUT /T 1 >nul 2>&1
+
+:: Check for internet connection
+ping -n 1 google.com >nul 2>&1
+if errorlevel 1 (
+    echo [ОШИБКА] Нет подключения к интернету.
+    echo (?) Пожалуйста, подключитесь к интернету и запустите скрипт снова.
+    TIMEOUT /T 600 >nul 2>&1
+    exit
+)
+
 python automator.py
 
 :: Closing window

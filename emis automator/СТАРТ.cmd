@@ -42,5 +42,5 @@ if "!COMPONENT_WAS_NOT_INSTALLED!"=="true" (
     echo Все компоненты уже были установлены, ура
 )
 
-:: --- Step 2. Setup automator ---
+:: --- Step 2. Setup ---
 setup_automator.cmd
