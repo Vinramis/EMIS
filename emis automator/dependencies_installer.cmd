@@ -7,7 +7,8 @@ ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
     echo [ОШИБКА] Нет подключения к интернету.
     echo (?) Пожалуйста, подключитесь к интернету и запустите скрипт снова.
-    goto :CLOSE_WINDOW
+    TIMEOUT /T 600 >nul 2>&1
+    exit
 )
 
 
