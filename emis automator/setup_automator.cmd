@@ -2,56 +2,6 @@
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 
-echo.
-echo.
-echo.
-echo === Настройка автоматизатора EMIS ===
-echo.
-echo Этот скрипт поможет настроить параметры для автоматизации, затем запустит её
-echo.
-echo.
-
-
-:: --- Check for dependencies ---
-TIMEOUT /T 1 >nul 2>&1
-echo.
-echo ---------------------------------------------------
-echo Проверка компонентов...
-set "COMPONENT_WAS_NOT_INSTALLED=false"
-
-python --version >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-    TIMEOUT /T 3 >nul 2>&1
-)
-
-python -c "import playwright" >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-)
-
-python -c "import pandas" >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-)
-
-python -c "import openpyxl" >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-)
-
-if "!COMPONENT_WAS_NOT_INSTALLED!"=="true" (
-    TIMEOUT /T 3 >nul 2>&1
-    echo.
-    echo Компоненты установлены успешно
-) else (
-    echo Все компоненты уже были установлены, ура
-)
-
 
 :: --- Check for existing config file ---
 TIMEOUT /T 1 >nul 2>&1
@@ -199,74 +149,6 @@ python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={
 del tmp_config.json
 
 echo Конфигурация успешно сохранена.
-
-
-@REM WAS PUT INTO SEPARATE SCRIPT
-
-
-@REM :INSTALL_DEPS
-@REM :: --- Install/Check Dependencies ---
-@REM echo.
-@REM echo ---------------------------------------------------
-@REM echo (?) Необходимо при первом запуске.
-@REM @REM set library_install="0"
-@REM @REM set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
-@REM @REM if not defined library_install set "library_install=n"
-
-@REM @REM echo.
-@REM set "library_install="
-@REM set /p "library_install=Установить библиотки и зависимости? (1 для да, пропуск для нет): "
-@REM if not defined library_install set "library_install=0"
-@REM TIMEOUT /T 1 >nul 2>&1
-@REM echo !library_install!
-@REM echo "!library_install!"=="1"
-@REM TIMEOUT /T 1 >nul 2>&1
-
-@REM if "!library_install!"=="1" (
-@REM     @REM winget install Python >nul 2>&1
-@REM     @REM python -m pip install playwright pandas openpyxl >nul 2>&1
-@REM     @REM python -m playwright install >nul 2>&1
-@REM     @REM pip install playwright >nul 2>&1
-@REM     @REM playwright install >nul 2>&1
-@REM     @REM pip install openpyxl >nul 2>&1
-
-@REM     TIMEOUT /T 2 >nul 2>&1
-@REM     echo Установка библиотек и зависимостей...
-@REM     echo (?) На это может потребоваться некоторое время.
-
-@REM     :: Local Install Python
-@REM     @REM winget install Python --silent --accept-source-agreements >nul 2>&1 apparantly doesn't work
-@REM     python_installer.exe /passive InstallAllUsers=0 PrependPath=1 >nul 2>&1
-@REM     echo Python установлен.
-@REM     TIMEOUT /T 2 >nul 2>&1
-@REM     echo.
-
-@REM     :: Install libraries
-@REM     python -m pip install playwright pandas openpyxl >nul 2>&1
-@REM     echo Библиотеки установлены.
-@REM     TIMEOUT /T 2 >nul 2>&1
-@REM     echo.
-
-@REM     :: Install only the WebKit engine
-@REM     python -m playwright install webkit >nul 2>&1
-@REM     echo Зависимости установлены.
-@REM     TIMEOUT /T 2 >nul 2>&1
-@REM     echo.
-@REM )
-
-@REM DEPRECATED
-@REM :: Check if Python is installed
-@REM python --version >nul 2>&1
-@REM if errorlevel 1 (
-@REM     winget install Python >nul 2>&1
-@REM )
-@REM :: Install libraries if not installed
-@REM winget install Python >nul 2>&1
-@REM python -m pip install playwright pandas  >nul 2>&1
-@REM python -m playwright install >nul 2>&1
-@REM pip install playwright >nul 2>&1
-@REM playwright install >nul 2>&1
-@REM pip install openpyxl >nul 2>&1
 
 
 :LAUNCH_AUTOMATOR
