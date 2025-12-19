@@ -15,7 +15,7 @@ goto :INSTALL_DEPS
 :INSTALL_PYTHON
 echo.
 echo [ИНФО] Устанавливаем Python...
-python_installer.exe /passive InstallAllUsers=0 PrependPath=1 >nul 2>&1
+python_installer.exe /quiet InstallAllUsers=0 PrependPath=1 >nul 2>&1
 echo [ИНФО] Python установлен.
 echo.
 goto :CLOSE_WINDOW
