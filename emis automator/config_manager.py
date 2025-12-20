@@ -26,13 +26,13 @@ class ConfigManager:
         self.HOMEWORK_FOLDER = self.config["automation_settings"]["HOMEWORK_FOLDER"]
 
         # Constants
-        self.ONE_ID_LOGIN_URL = "https://emis.edu.uz/login"
+        self.ONE_ID_LOGIN_URL = "https://litsey.edu.uz/login"
         self.ONE_ID_BUTTON_SELECTOR = "#root > div > div > div > main > div > div > a"
         self.LOGIN_FIELD_PLACEHOLDER = "Loginni kiriting"
         self.PASSWORD_FIELD_PLACEHOLDER = "Parolni kiriting"
         self.LOGIN_BUTTON_TEXT = "Kirish"
-        self.SUCCESS_URL = "https://emis.edu.uz"
-        self.NEW_TOPIC_URL = "https://emis.edu.uz/teacher/topics/add"
+        self.SUCCESS_URL = "https://litsey.edu.uz"
+        self.NEW_TOPIC_URL = "https://litsey.edu.uz/teacher/topics/add"
         
         # Selectors
         self.TOPICS_PREFIX = "#topics_"
