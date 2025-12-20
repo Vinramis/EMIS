@@ -161,12 +161,13 @@ echo.
 TIMEOUT /T 1 >nul 2>&1
 
 :: Check for internet connection
+:CHECK_CONNECTION
 ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
     echo [ОШИБКА] Нет подключения к интернету.
-    echo (?) Пожалуйста, подключитесь к интернету и запустите скрипт снова.
-    TIMEOUT /T 600 >nul 2>&1
-    exit
+    echo (?) Пожалуйста, проверьте подключение и нажмите Enter
+    pause >nul 2>&1
+    goto :CHECK_CONNECTION
 )
 
 python automator.py

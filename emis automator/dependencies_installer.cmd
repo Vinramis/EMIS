@@ -1,80 +1,90 @@
 @echo off
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
-
-:: Check for internet connection
-ping -n 1 google.com >nul 2>&1
-if errorlevel 1 (
-    echo [ОШИБКА] Нет подключения к интернету.
-    echo (?) Пожалуйста, подключитесь к интернету и запустите скрипт снова.
-    TIMEOUT /T 600 >nul 2>&1
-    exit
-)
+:: %= comment =% is a structure used to comment inside of a single line in batch files
 
 
-:: Check if Python is installed
-python --version >nul 2>&1
-if errorlevel 1 (
-    goto :INSTALL_PYTHON
-) else (
-    goto :INSTALL_DEPS
-)
+:: REDUNDANT
+@REM :: Check for what we need
+@REM python --version >nul 2>&1
+@REM if errorlevel 1 (
+@REM     goto :INSTALL_PYTHON
+@REM ) else (
+@REM     goto :INSTALL_DEPS
+@REM )
+:: REDUNDANT
 
 
 :: Install Python (local)
 :INSTALL_PYTHON
+::     Convert the relative path to a FULL absolute path
+set "RELATIVE_PATH=python314"
+for %%i in ("%RELATIVE_PATH%") do set "PYTHON_FULL_PATH=%%~fi"
+
 echo.
 echo [ИНФО] Устанавливаем Python, пожалуйста, не закрывайте окно...
-python_installer.exe /quiet InstallAllUsers=0 PrependPath=1 >nul 2>&1
+python_installer.exe /passive InstallAllUsers=0 PrependPath=0 InstallLauncherAllUsers=0 Include_test=0 Include_doc=0 Include_pip=1 Shortcuts=1 TargetDir="!PYTHON_FULL_PATH!"
 echo [ИНФО] Python установлен.
-echo.
+TIMEOUT /T 1 >nul 2>&1
 
-goto :RESTART
+goto :INSTALL_DEPS
 
 
+:: Install dependencies
 :INSTALL_DEPS
-:: Install libraries
+::     Check for internet connection
+:CHECK_CONNECTION
+ping -n 1 google.com >nul 2>&1
+if errorlevel 1 (
+    echo [ОШИБКА] Нет подключения к интернету.
+    echo (?) Пожалуйста, проверьте подключение и нажмите Enter
+    pause >nul 2>&1
+    goto :CHECK_CONNECTION
+)
+
+
+::     Install libraries
 echo.
 echo [ИНФО] Устанавливаем библиотеки (всего 3), пожалуйста, не закрывайте окно...
 echo.
 
-python -m pip install playwright >nul 2>&1
+TIMEOUT /T 1 >nul 2>&1
+!PYTHON_PATH!\\python -m pip install playwright >nul 2>&1
 echo Библиотека Playwright установлена. 
 echo (?) Эта библиотека нужна для работы с веб-браузером
 
 echo.
 
-python -m pip install pandas >nul 2>&1
+TIMEOUT /T 1 >nul 2>&1
+!PYTHON_PATH!\python -m pip install pandas >nul 2>&1
 echo Библиотека Pandas установлена.
 echo (?) Эта библиотека нужна для работы с файлами
 
 echo.
 
-python -m pip install openpyxl >nul 2>&1
+TIMEOUT /T 1 >nul 2>&1
+!PYTHON_PATH!python -m pip install openpyxl >nul 2>&1
 echo Библиотека OpenPyXL установлена.
 echo (?) Эта библиотека нужна для работы с Excel
 
 echo.
-echo [ИНФО] Все библиотеки установлены.
 TIMEOUT /T 1 >nul 2>&1
+echo [ИНФО] Все библиотеки установлены.
 
-:: Install WebKit engine
+::     Install WebKit engine
 echo.
-echo [ИНФО] Устанавливаем зависимость, пожалуйста, не закрывайте окно...
+echo [ИНФО] Устанавливаем зависимость (WebKit), пожалуйста, не закрывайте окно...
+TIMEOUT /T 1 >nul 2>&1
 echo (?) Это самый долгий процесс
-echo (?) 
-python -m playwright install webkit >nul 2>&1
+TIMEOUT /T 3 >nul 2>&1
+echo (?) WebKit - это браузер, который будет использоваться для автоматизации
+TIMEOUT /T 1 >nul 2>&1
+!PYTHON_PATH!python -m playwright install webkit >nul 2>&1
 echo [ИНФО] Зависимости установлены.
 echo.
 TIMEOUT /T 1 >nul 2>&1
 
 goto :CLOSE_WINDOW
-
-
-:: Restart (to apply changes)
-:RESTART
-start "" "%~f0"
-exit /b
 
 
 :: Closing window
