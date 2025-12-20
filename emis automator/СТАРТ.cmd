@@ -1,11 +1,12 @@
-:: --- Activate fullscreen mode ---
-mode con: cols=120 lines=30
-
 @echo off
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 
-:: --- Step 0. Welcome ---
+:: --- Activate fullscreen mode ---
+if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
+TITLE Автоматизатор EMIS v0.4.5
+
+:: --- Welcome ---
 echo.
 echo.
 echo.
@@ -15,69 +16,54 @@ echo Этот скрипт поможет настроить параметры 
 echo.
 echo.
 
-
-:: --- Step 1. Check for dependencies ---
-TIMEOUT /T 1 >nul 2>&1
-echo.
+:: --- Update dependencies ---
 echo ---------------------------------------------------
-echo Проверка компонентов...
+echo Обновление компонентов в отдельном окне...
+start /wait dependencies_installer.cmd
+TIMEOUT /T 1 >nul
 
-
-set "COMPONENT_WAS_NOT_INSTALLED=false"
-
-python --version >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-)
-
-:: DEPRECATED
-@REM python -c "from playwright.sync_api import sync_playwright; import pandas; import openpyxl; with sync_playwright() as p: p.webkit.launch(headless=False).new_page()" >nul 2>&1
-
-@REM (
-@REM     echo from playwright.sync_api import sync_playwright
-@REM     echo import pandas
-@REM     echo import openpyxl
-@REM     echo with sync_playwright(^) as p: 
-@REM     echo     p.webkit.launch(headless=True^).new_page(^) 
-@REM )>test.py
-
-@REM python test.py >nul 2>&1
-if errorlevel 1 (
-    set "COMPONENT_WAS_NOT_INSTALLED=true"
-    dependencies_installer.cmd
-)
-@REM del test.py
-
-if "!COMPONENT_WAS_NOT_INSTALLED!"=="true" (
-    echo.
-    echo Компоненты установлены успешно
-) else (
-    echo Все компоненты уже были установлены, ура
-)
-
-:: --- Step 2. Setup ---
+:: --- Setup ---
+:: To be separated into a different file
 setup_automator.cmd
 
-@REM @echo off
-@REM cd /d "%~dp0"
 
-@REM :: Create the file with a check
-@REM echo Writing test.py...
-@REM (
-@REM     echo from playwright.sync_api import sync_playwright
-@REM     echo import pandas
-@REM     echo import openpyxl
-@REM     echo print()
-@REM     echo print("File written successfully!")
-@REM )>test.py
 
-@REM if not exist test.py (
-@REM     echo [ERROR] test.py was NEVER created! Check folder permissions.
-@REM     pause
-@REM     exit
+:: REDUNDANT (hopefully)===============================================================================
+@REM :: --- Step 1. Check for dependencies ---
+@REM TIMEOUT /T 1 >nul 2>&1
+@REM echo.
+@REM echo ---------------------------------------------------
+@REM echo Проверка компонентов...
+
+
+@REM set "COMPONENT_WAS_NOT_INSTALLED=false"
+
+@REM python --version >nul 2>&1
+@REM if errorlevel 1 (
+@REM     set "COMPONENT_WAS_NOT_INSTALLED=true"
+@REM     dependencies_installer.cmd
 @REM )
 
-@REM echo Running test.py...
-@REM python test.py
-@REM pause
+
+@REM @REM (
+@REM @REM     echo from playwright.sync_api import sync_playwright
+@REM @REM     echo import pandas
+@REM @REM     echo import openpyxl
+@REM @REM     echo with sync_playwright(^) as p: 
+@REM @REM     echo     p.webkit.launch(headless=True^).new_page(^) 
+@REM @REM )>test.py
+
+@REM @REM python test.py >nul 2>&1
+@REM if errorlevel 1 (
+@REM     set "COMPONENT_WAS_NOT_INSTALLED=true"
+@REM     dependencies_installer.cmd
+@REM )
+@REM @REM del test.py
+
+@REM if "!COMPONENT_WAS_NOT_INSTALLED!"=="true" (
+@REM     echo.
+@REM     echo Компоненты установлены успешно
+@REM ) else (
+@REM     echo Все компоненты уже были установлены, ура
+@REM )
+:: ===============================================================================

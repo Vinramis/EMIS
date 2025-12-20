@@ -1,7 +1,9 @@
 @echo off
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
-:: %= comment =% is a structure used to comment inside of a single line in batch files
+
+
+
 
 
 :: REDUNDANT
@@ -12,80 +14,105 @@ setlocal enabledelayedexpansion
 @REM ) else (
 @REM     goto :INSTALL_DEPS
 @REM )
+
+@REM :: Install Python (local)
+@REM :INSTALL_PYTHON
+@REM ::     Convert the relative path to a FULL absolute path
+@REM set "RELATIVE_PATH=python314"
+@REM for %%i in ("%RELATIVE_PATH%") do set "PYTHON_FULL_PATH=%%~fi"
+
+@REM echo.
+@REM echo [ИНФО] Устанавливаем Python, пожалуйста, не закрывайте окно...
+@REM python_installer.exe /passive InstallAllUsers=0 PrependPath=0 InstallLauncherAllUsers=0 Include_test=0 Include_doc=0 Include_pip=1 Shortcuts=1 TargetDir="!PYTHON_FULL_PATH!"
+@REM echo [ИНФО] Python установлен.
+@REM TIMEOUT /T 1 >nul 2>&1
+
+@REM goto :INSTALL_DEPS
+
+@REM :: Install dependencies
+@REM :INSTALL_DEPS
+@REM ::     Check for internet connection
+@REM :CHECK_CONNECTION
+@REM ping -n 1 google.com >nul 2>&1
+@REM if errorlevel 1 (
+@REM     echo [ОШИБКА] Нет подключения к интернету.
+@REM     echo (?) Пожалуйста, проверьте подключение и нажмите Enter
+@REM     pause >nul 2>&1
+@REM     goto :CHECK_CONNECTION
+@REM )
 :: REDUNDANT
 
 
-:: Install Python (local)
-:INSTALL_PYTHON
-::     Convert the relative path to a FULL absolute path
-set "RELATIVE_PATH=python314"
-for %%i in ("%RELATIVE_PATH%") do set "PYTHON_FULL_PATH=%%~fi"
+
+:: Doesn't work as intended
+@REM :: Check for internet connection
+@REM :CHECK_CONNECTION
+@REM ping 8.8.8.8 -n 1 | find "TTL=" >nul
+@REM if errorlevel 0 (
+@REM     goto :INSTALL_DEPS
+@REM ) else (
+@REM     goto :ERROR_MESSAGE
+@REM )
+
+@REM :ERROR_MESSAGE
+@REM echo [ОШИБКА] Нет подключения к интернету. 
+@REM echo (?) Пожалуйста, проверьте подключение и нажмите Enter
+@REM pause >nul
+@REM goto :CHECK_CONNECTION
+
+
+
+
+
+:: Install libraries
+@REM :INSTALL_DEPS
+
+@REM set "ROOT_DIR=%cd%"
+@REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
+@REM set "PIP_PATH="!ROOT_DIR!\python314\Scripts\pip""
+
+set "PYTHON_PATH="python314\python""
+set "PIP_PATH="python314\Scripts\pip""
 
 echo.
-echo [ИНФО] Устанавливаем Python, пожалуйста, не закрывайте окно...
-python_installer.exe /passive InstallAllUsers=0 PrependPath=0 InstallLauncherAllUsers=0 Include_test=0 Include_doc=0 Include_pip=1 Shortcuts=1 TargetDir="!PYTHON_FULL_PATH!"
-echo [ИНФО] Python установлен.
-TIMEOUT /T 1 >nul 2>&1
-
-goto :INSTALL_DEPS
-
-
-:: Install dependencies
-:INSTALL_DEPS
-::     Check for internet connection
-:CHECK_CONNECTION
-ping -n 1 google.com >nul 2>&1
-if errorlevel 1 (
-    echo [ОШИБКА] Нет подключения к интернету.
-    echo (?) Пожалуйста, проверьте подключение и нажмите Enter
-    pause >nul 2>&1
-    goto :CHECK_CONNECTION
-)
-
-
-::     Install libraries
-echo.
-echo [ИНФО] Устанавливаем библиотеки (всего 3), пожалуйста, не закрывайте окно...
+echo [ИНФО] Обновляем библиотеки (всего 3), пожалуйста, не закрывайте окно...
 echo.
 
-TIMEOUT /T 1 >nul 2>&1
-!PYTHON_PATH!\\python -m pip install playwright >nul 2>&1
-echo Библиотека Playwright установлена. 
-echo (?) Эта библиотека нужна для работы с веб-браузером
-
-echo.
-
-TIMEOUT /T 1 >nul 2>&1
-!PYTHON_PATH!\python -m pip install pandas >nul 2>&1
-echo Библиотека Pandas установлена.
-echo (?) Эта библиотека нужна для работы с файлами
+echo (?) Библиотека Playwright нужна для работы с веб-браузером
+!PIP_PATH! install playwright >nul
+TIMEOUT /T 1 >nul
+echo Библиотека Playwright обновлена. 
 
 echo.
 
-TIMEOUT /T 1 >nul 2>&1
-!PYTHON_PATH!python -m pip install openpyxl >nul 2>&1
-echo Библиотека OpenPyXL установлена.
-echo (?) Эта библиотека нужна для работы с Excel
+echo (?) Библиотека Pandas нужна для работы с файлами
+!PIP_PATH! install pandas >nul
+TIMEOUT /T 1 >nul
+echo Библиотека Pandas обновлена.
 
 echo.
-TIMEOUT /T 1 >nul 2>&1
-echo [ИНФО] Все библиотеки установлены.
 
-::     Install WebKit engine
+echo (?) Библиотека OpenPyXL нужна для работы с Excel
+!PIP_PATH! install openpyxl >nul
+TIMEOUT /T 1 >nul
+echo Библиотека OpenPyXL обновлена.
+
 echo.
-echo [ИНФО] Устанавливаем зависимость (WebKit), пожалуйста, не закрывайте окно...
-TIMEOUT /T 1 >nul 2>&1
+TIMEOUT /T 1 >nul
+echo [ИНФО] Все библиотеки обновлены.
+
+:: Install WebKit engine
+echo.
+echo.
+echo [ИНФО] Обновляем зависимость (WebKit), пожалуйста, не закрывайте окно...
+TIMEOUT /T 1 >nul
 echo (?) Это самый долгий процесс
-TIMEOUT /T 3 >nul 2>&1
+TIMEOUT /T 2 >nul
 echo (?) WebKit - это браузер, который будет использоваться для автоматизации
-TIMEOUT /T 1 >nul 2>&1
-!PYTHON_PATH!python -m playwright install webkit >nul 2>&1
-echo [ИНФО] Зависимости установлены.
+TIMEOUT /T 1 >nul
+!PYTHON_PATH! -m playwright install webkit >nul
+echo [ИНФО] Зависимость обновлена.
 echo.
-TIMEOUT /T 1 >nul 2>&1
 
-goto :CLOSE_WINDOW
-
-
-:: Closing window
-:CLOSE_WINDOW
+:: Close window / Next process
+exit

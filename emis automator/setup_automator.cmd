@@ -4,7 +4,6 @@ setlocal enabledelayedexpansion
 
 
 :: --- Check for existing config file ---
-TIMEOUT /T 1 >nul 2>&1
 echo.
 echo ---------------------------------------------------
 echo Проверка конфигурации...
@@ -158,24 +157,29 @@ echo ---------------------------------------------------
 echo Настройка завершена. Запускаем автоматизатор...
 echo.
 echo.
-TIMEOUT /T 1 >nul 2>&1
 
 :: Check for internet connection
-:CHECK_CONNECTION
-ping -n 1 google.com >nul 2>&1
-if errorlevel 1 (
-    echo [ОШИБКА] Нет подключения к интернету.
-    echo (?) Пожалуйста, проверьте подключение и нажмите Enter
-    pause >nul 2>&1
-    goto :CHECK_CONNECTION
-)
+@REM :CHECK_CONNECTION
+@REM ping -n 1 google.com >nul 2>&1
+@REM if errorlevel 1 (
+@REM     echo [ОШИБКА] Нет подключения к интернету.
+@REM     echo (?) Пожалуйста, проверьте подключение и нажмите Enter
+@REM     pause >nul
+@REM     goto :CHECK_CONNECTION
+@REM )
 
-python automator.py
+
+@REM set "ROOT_DIR=%cd%"
+@REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
+@REM !PYTHON_PATH! automator.py
+set "PYTHON_PATH="python314\python""
+!PYTHON_PATH! automator.py 2>&1
 
 :: Closing window
 echo.
 echo.
 echo Кажется, браузер был закрыт. Нажмите любую клавишу для выхода...
+echo.
 echo.
 echo.
 pause >nul
