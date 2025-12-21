@@ -101,16 +101,16 @@ if not defined LINE_COUNT set "LINE_COUNT=%DEFAULT_LINE_COUNT%"
 @REM )
 set "MODE=%DEFAULT_MODE%"
 
-echo.
-echo.
 @REM DEPRECATED
+@REM echo.
+@REM echo.
 @REM echo (?) Если все файлы находятся в одной папке, укажите ЕЁ для обеих категорий.
 @REM echo.
 
 
 set "TOPICS_FOLDER="
 @REM DEPRECATED
-@REM set /p "TOPICS_FOLDER=Введите имя папки для файлов тем [%DEFAULT_TOPICS_FOLDER%]: "
+@REM set /p "TOPICS_FOLDER=Введите имя папки для файлов классных работ [%DEFAULT_TOPICS_FOLDER%]: "
 if not defined TOPICS_FOLDER set "TOPICS_FOLDER=%DEFAULT_TOPICS_FOLDER%"
 
 @REM echo.
