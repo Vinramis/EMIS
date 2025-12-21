@@ -36,12 +36,12 @@ echo Библиотека Playwright обновлена.
 
 echo.
 
-echo (?) Библиотека Pandas нужна для работы с файлами
-!PIP_PATH! install pandas --no-warn-script-location >nul
-TIMEOUT /T 1 >nul
-echo Библиотека Pandas обновлена.
+@REM echo (?) Библиотека Pandas нужна для работы с файлами
+@REM !PIP_PATH! install pandas --no-warn-script-location >nul
+@REM TIMEOUT /T 1 >nul
+@REM echo Библиотека Pandas обновлена.
 
-echo.
+@REM echo.
 
 echo (?) Библиотека OpenPyXL нужна для работы с Excel
 !PIP_PATH! install openpyxl --no-warn-script-location >nul
