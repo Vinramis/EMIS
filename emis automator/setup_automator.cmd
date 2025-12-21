@@ -1,7 +1,8 @@
 @echo off
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
-
+:: Define python path
+set "PYTHON_PATH="python314\python""
 
 :: --- Check for existing config file ---
 echo.
@@ -144,7 +145,7 @@ echo Сохранение конфигурации...
 ) > tmp_config.json
 
 :: Add credentials to the JSON file
-python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul 2>&1
+!PYTHON_PATH! -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul
 del tmp_config.json
 
 TIMEOUT /T 1 >nul
@@ -173,8 +174,7 @@ echo.
 @REM set "ROOT_DIR=%cd%"
 @REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
 @REM !PYTHON_PATH! automator.py >nul 2>&1
-set "PYTHON_PATH="python314\python""
-!PYTHON_PATH! automator.py >nul 2>&1
+!PYTHON_PATH! automator.py >nul
 
 :: Closing window
 echo.
