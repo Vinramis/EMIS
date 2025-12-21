@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 :: --- Activate fullscreen mode ---
 if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
-TITLE Автоматизатор EMIS v0.4.8
+TITLE Автоматизатор EMIS v0.5.3
 
 :: --- Welcome ---
 echo.
