@@ -65,7 +65,7 @@ echo (?) Оставьте пустым и нажмите Enter, чтобы со�
 echo (?) Значения по умолчанию показаны в квадратных скобках
 echo.
 
-set DEFAULT_LINE_COUNT=6
+set DEFAULT_END_ON_LINE=6
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
 set DEFAULT_START_FROM_LINE=1
@@ -86,9 +86,9 @@ set "START_FROM_LINE="
 set /p "START_FROM_LINE=С какой темы начать обработку (номером) [%DEFAULT_START_FROM_LINE%]: "
 if not defined START_FROM_LINE set "START_FROM_LINE=%DEFAULT_START_FROM_LINE%"
 
-set "LINE_COUNT="
-set /p "LINE_COUNT=На какой теме закончить обработку (номером) [%DEFAULT_LINE_COUNT%]: "
-if not defined LINE_COUNT set "LINE_COUNT=%DEFAULT_LINE_COUNT%"
+set "END_ON_LINE="
+set /p "END_ON_LINE=На какой теме закончить обработку (номером) [%DEFAULT_END_ON_LINE%]: "
+if not defined END_ON_LINE set "END_ON_LINE=%DEFAULT_END_ON_LINE%"
 
 
 @REM echo.
@@ -135,10 +135,10 @@ echo Сохранение конфигурации...
 (
     echo {
     echo     "automation_settings": {
-    echo         "LINE_COUNT": !LINE_COUNT!,
     echo         "TOPICS_FILE_PATH": "!JSON_TOPICS_FILE_PATH!",
     echo         "START_CELL": "!START_CELL!",
     echo         "START_FROM_LINE": !START_FROM_LINE!,
+    echo         "END_ON_LINE": !END_ON_LINE!,
     echo         "MODE": "!MODE!",
     echo         "TOPICS_FOLDER": "!JSON_TOPICS_FOLDER!",
     echo         "HOMEWORK_FOLDER": "!JSON_HOMEWORK_FOLDER!"

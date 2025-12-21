@@ -54,34 +54,34 @@ def run_automation():
         print("Запуск автоматизации...")
         page.goto(cfg.NEW_TOPIC_URL)
 
-        if cfg.LINE_COUNT < cfg.START_FROM_LINE:
-            print(
-                f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE})."
-            )
-            return
+        # if cfg.LINE_COUNT < cfg.START_FROM_LINE:
+        #     print(
+        #         f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE})."
+        #     )
+        #     return
 
-        actual_length = min(cfg.LINE_COUNT, len(topic_names))
+        actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE
         counter = -1
 
-        for topic_number in range(cfg.START_FROM_LINE, actual_length + 1):
+        for current_topic_number in range(cfg.START_FROM_LINE, cfg.END_ON_LINE):
             counter += 1
-            print(f"\n--- Обработка строки {topic_number} из {actual_length} ---")
+            print(f"\n--- Обработка строки {counter + 1} из {actual_length} ---") # Counter + 1 because first element will be 1 AND we need to count which actual line we are on
 
-            topic_name = topic_names[topic_number - 1]
+            topic_name = topic_names[current_topic_number - 1] # current_topic_number and not counter, because topic_names contains all topics, not only which we need to fill
 
             # Поиск файлов
-            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, topic_number)
-            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, topic_number)
+            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, current_topic_number)
+            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, current_topic_number)
 
             if not topic_file_path:
-                print(f"[ОШИБКА] Файл темы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
+                print(f"[ОШИБКА] Файл классной работы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
             if not homework_file_path:
                 print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
 
             try:
                 print("Нажатие 'Добавить строку'...")
                 page.locator(cfg.ADD_LINE_BUTTON).click()
-                time.sleep(0.01)
+                time.sleep(0.1)
 
                 if not topic_name:
                     print("[КРИТИЧЕСКАЯ ОШИБКА] Имя темы не определено.")
@@ -99,7 +99,7 @@ def run_automation():
                     page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.HOMEWORK_FILE_SUFFIX}").set_input_files(homework_file_path)
 
             except Exception as e:
-                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {topic_number}): {e}")
+                print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {current_topic_number}): {e}")
                 print("Сохранение скриншота ошибки.")
                 page.screenshot(path="error_screenshot.png")
                 break

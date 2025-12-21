@@ -17,10 +17,10 @@ class ConfigManager:
         self.PASSWORD = self.config["credentials"]["password"]
 
         # Automation Settings
-        self.LINE_COUNT = self.config["automation_settings"]["LINE_COUNT"]
         self.TOPICS_FILE_PATH = self.config["automation_settings"]["TOPICS_FILE_PATH"]
         self.START_CELL = self.config["automation_settings"]["START_CELL"]
         self.START_FROM_LINE = self.config["automation_settings"]["START_FROM_LINE"]
+        self.END_ON_LINE = self.config["automation_settings"]["END_ON_LINE"]
         self.MODE = self.config["automation_settings"]["MODE"]
         self.TOPICS_FOLDER = self.config["automation_settings"]["TOPICS_FOLDER"]
         self.HOMEWORK_FOLDER = self.config["automation_settings"]["HOMEWORK_FOLDER"]
