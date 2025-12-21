@@ -10,7 +10,7 @@ echo Проверка конфигурации...
 if exist "config.json" (
     set "USE_EXISTING="
     set /p "USE_EXISTING=Конфигурация уже существует, использовать её? (введите 1 для нет, пропуск для да): "
-    TIMEOUT /T 1 >nul 2>&1
+    TIMEOUT /T 1 >nul
     
     if "!USE_EXISTING!"=="1" (
         echo Перенастройка параметров...
@@ -21,10 +21,10 @@ if exist "config.json" (
     )
 ) else (
     echo --- Учетные данные ---
-    TIMEOUT /T 1 >nul 2>&1
+    TIMEOUT /T 1 >nul
     set /p "LOGIN=Введите ваш логин EMIS: "
 
-    TIMEOUT /T 1 >nul 2>&1
+    TIMEOUT /T 1 >nul
     set /p "PASSWORD=Введите ваш пароль EMIS: "
 )
 goto :GATHER_SETTINGS
@@ -48,9 +48,9 @@ set "EXISTING_LOGIN=!EXISTING_LOGIN:~1!"
 set "EXISTING_PASSWORD=!EXISTING_PASSWORD:~1!"
 
 set /p "LOGIN=Введите ваш логин EMIS [!EXISTING_LOGIN!]: "
-TIMEOUT /T 1 >nul 2>&1
+TIMEOUT /T 1 >nul
 set /p "PASSWORD=Введите ваш пароль EMIS [!EXISTING_PASSWORD!]: "
-TIMEOUT /T 1 >nul 2>&1
+TIMEOUT /T 1 >nul
 if not defined LOGIN set "LOGIN=!EXISTING_LOGIN!"
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 
@@ -147,6 +147,7 @@ echo Сохранение конфигурации...
 python -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul 2>&1
 del tmp_config.json
 
+TIMEOUT /T 1 >nul
 echo Конфигурация успешно сохранена.
 
 
