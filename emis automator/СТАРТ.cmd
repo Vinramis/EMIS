@@ -26,8 +26,7 @@ if errorlevel 0 (
 ) else (
     echo [ОШИБКА] Что-то пошло не так
 )
-echo.
-TIMEOUT /T 1 >nul
+echo. & TIMEOUT /T 1 >nul
 
 :: --- Setup ---
 :: To be separated into a different file
