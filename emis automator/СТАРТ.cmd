@@ -9,17 +9,24 @@ TITLE Автоматизатор EMIS v0.6
 :: --- Welcome ---
 echo.
 echo.
-echo.
+echo. & TIMEOUT /T 1 >nul
 echo === Настройка автоматизатора EMIS ===
-echo.
+echo. & TIMEOUT /T 1 >nul
 echo Этот скрипт поможет настроить параметры для автоматизации, затем запустит её
 echo.
 echo.
 
 :: --- Update dependencies ---
+echo. & TIMEOUT /T 1 >nul
 echo ---------------------------------------------------
 echo Обновление компонентов в отдельном окне...
 start /wait dependencies_installer.cmd
+if errorlevel 0 (
+    echo [ИНФО] Компоненты обновлены успешно
+) else (
+    echo [ОШИБКА] Что-то пошло не так
+)
+echo.
 TIMEOUT /T 1 >nul
 
 :: --- Setup ---
