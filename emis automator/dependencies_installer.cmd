@@ -26,7 +26,8 @@ set "PYTHON_PATH="python314\python""
 set "PIP_PATH="python314\Scripts\pip""
 
 echo.
-echo [ИНФО] Обновляем библиотеки (всего 3), пожалуйста, не закрывайте окно...
+echo [ИНФО] Обновляем библиотеки (всего 2)...
+echo (?) Можете закрыть окно, если это занимает слишком много времени
 echo.
 
 echo (?) Библиотека Playwright нужна для работы с веб-браузером
@@ -55,10 +56,8 @@ echo [ИНФО] Все библиотеки обновлены.
 :: Install WebKit engine
 echo.
 echo.
-echo [ИНФО] Обновляем зависимость (WebKit), пожалуйста, не закрывайте окно...
+echo [ИНФО] Обновляем зависимость (WebKit)...
 TIMEOUT /T 1 >nul
-echo (?) Это самый долгий процесс
-TIMEOUT /T 2 >nul
 echo (?) WebKit - это браузер, который будет использоваться для автоматизации
 TIMEOUT /T 1 >nul
 !PYTHON_PATH! -m playwright install webkit >nul
@@ -66,5 +65,10 @@ echo [ИНФО] Зависимость обновлена.
 echo.
 
 :: Close window / Next process
+echo.
+echo (?) Обновление завершено!
+echo [ИНФО] Закрываем окно...
+echo.
+TIMEOUT /T 1 >nul
 @REM pause >nul
 exit
