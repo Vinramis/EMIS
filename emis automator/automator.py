@@ -63,7 +63,7 @@ def run_automation():
         actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE
         counter = -1
 
-        for current_topic_number in range(cfg.START_FROM_LINE, cfg.END_ON_LINE):
+        for current_topic_number in range(cfg.START_FROM_LINE, cfg.END_ON_LINE + 1):
             counter += 1
             print(f"\n--- Обработка строки {counter + 1} из {actual_length} ---") # Counter + 1 because first element will be 1 AND we need to count which actual line we are on
 

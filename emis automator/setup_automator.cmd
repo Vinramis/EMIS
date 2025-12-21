@@ -176,7 +176,7 @@ echo.
 @REM set "ROOT_DIR=%cd%"
 @REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
 @REM !PYTHON_PATH! automator.py >nul 2>&1
-!PYTHON_PATH! automator.py >nul
+!PYTHON_PATH! automator.py
 
 :: Closing window
 echo.
