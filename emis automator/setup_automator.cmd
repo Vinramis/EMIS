@@ -79,7 +79,8 @@ set "TOPICS_FILE_PATH="
 if not defined TOPICS_FILE_PATH set "TOPICS_FILE_PATH=%DEFAULT_TOPICS_FILE_PATH%"
 
 set "START_CELL="
-set /p "START_CELL=Введите начальную ячейку в файле Excel [%DEFAULT_START_CELL%]: "
+@REM DEPRECATED
+@REM set /p "START_CELL=Введите начальную ячейку в файле Excel [%DEFAULT_START_CELL%]: "
 if not defined START_CELL set "START_CELL=%DEFAULT_START_CELL%"
 
 set "START_FROM_LINE="
@@ -91,9 +92,9 @@ set /p "END_ON_LINE=На какой теме закончить обработк
 if not defined END_ON_LINE set "END_ON_LINE=%DEFAULT_END_ON_LINE%"
 
 
+@REM DEPRECATED 
 @REM echo.
 @REM :GET_MODE
-@REM DEPRECATED 
 @REM set "MODE_INPUT="
 @REM @REM echo Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]:
 @REM set /p "MODE_INPUT=Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]: "
@@ -103,12 +104,6 @@ if not defined END_ON_LINE set "END_ON_LINE=%DEFAULT_END_ON_LINE%"
 @REM     set "MODE=!DEFAULT_MODE!"
 @REM )
 set "MODE=%DEFAULT_MODE%"
-
-@REM DEPRECATED
-@REM echo.
-@REM echo.
-@REM echo (?) Если все файлы находятся в одной папке, укажите ЕЁ для обеих категорий.
-@REM echo.
 
 
 set "TOPICS_FOLDER="
