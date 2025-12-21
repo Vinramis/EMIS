@@ -37,7 +37,7 @@ echo (?) Оставьте пустым и нажмите Enter, чтобы со�
 echo (?) Существующие учетные данные будут в квадратных скобках
 echo.
 
-:: Try to parse existing credentials to use as defaults
+:: Parsing existing credentials
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"login\"" "config.json"') do set "EXISTING_LOGIN=%%~a"
 for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"password\"" "config.json"') do set "EXISTING_PASSWORD=%%~a"
 :: Remove quotes
@@ -171,9 +171,9 @@ echo.
 
 @REM set "ROOT_DIR=%cd%"
 @REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
-@REM !PYTHON_PATH! automator.py
+@REM !PYTHON_PATH! automator.py >nul 2>&1
 set "PYTHON_PATH="python314\python""
-!PYTHON_PATH! automator.py 2>&1
+!PYTHON_PATH! automator.py >nul 2>&1
 
 :: Closing window
 echo.
