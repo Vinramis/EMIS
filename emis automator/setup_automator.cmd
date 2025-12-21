@@ -91,12 +91,8 @@ set "END_ON_LINE="
 set /p "END_ON_LINE=На какой теме закончить обработку (номером) [%DEFAULT_END_ON_LINE%]: "
 if not defined END_ON_LINE set "END_ON_LINE=%DEFAULT_END_ON_LINE%"
 
-
+set "MODE_INPUT="
 @REM DEPRECATED 
-@REM echo.
-@REM :GET_MODE
-@REM set "MODE_INPUT="
-@REM @REM echo Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]:
 @REM set /p "MODE_INPUT=Выберите режим обработки (введите 1 для в строчку, что угодно другое для столбца) [%DEFAULT_MODE%]: "
 @REM if "!MODE_INPUT!"=="1" (
 @REM     set "MODE=row"
@@ -157,20 +153,6 @@ echo Настройка завершена. Запускаем автомати�
 echo.
 echo.
 
-:: Check for internet connection
-@REM :CHECK_CONNECTION
-@REM ping -n 1 google.com >nul 2>&1
-@REM if errorlevel 1 (
-@REM     echo [ОШИБКА] Нет подключения к интернету.
-@REM     echo (?) Пожалуйста, проверьте подключение и нажмите Enter
-@REM     pause >nul
-@REM     goto :CHECK_CONNECTION
-@REM )
-
-
-@REM set "ROOT_DIR=%cd%"
-@REM set "PYTHON_PATH="!ROOT_DIR!\python314\python""
-@REM !PYTHON_PATH! automator.py >nul 2>&1
 !PYTHON_PATH! automator.py
 
 :: Closing window

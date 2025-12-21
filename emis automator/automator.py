@@ -45,6 +45,7 @@ def run_automation():
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
+        file_utils.rename_single_excel()
         topic_names = excel_utils.read_topics_from_excel(cfg.TOPICS_FILE_PATH, cfg.START_CELL, cfg.MODE)
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
@@ -53,12 +54,6 @@ def run_automation():
         # 5. Цикл автоматизации
         print("Запуск автоматизации...")
         page.goto(cfg.NEW_TOPIC_URL)
-
-        # if cfg.LINE_COUNT < cfg.START_FROM_LINE:
-        #     print(
-        #         f"[КРИТИЧЕСКАЯ ОШИБКА] Количество строк ({cfg.LINE_COUNT}) меньше чем начальное значение ({cfg.START_FROM_LINE})."
-        #     )
-        #     return
 
         actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE
         counter = -1

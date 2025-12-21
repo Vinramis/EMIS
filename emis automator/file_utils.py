@@ -135,3 +135,31 @@ def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
         return new_topics_folder, new_homework_folder
     
     return topics_folder, homework_folder
+
+def rename_single_excel(new_name="КТП.xlsx"):
+    """
+    Renames the single .xlsx file in the current directory to the specified name.
+    """
+    # 1. Get list of all files in the current directory
+    files = os.listdir('.')
+    
+    # 2. Filter for .xlsx files (ignoring temporary ~$ files created by Excel)
+    excel_files = [f for f in files if f.endswith('.xlsx') and not f.startswith('~$')]
+    
+    # 3. Check if exactly one file exists
+    if len(excel_files) == 1:
+        old_name = excel_files[0]
+        
+        # Avoid renaming if it's already named correctly
+        if old_name == new_name:
+            return
+            
+        try:
+            os.rename(old_name, new_name)
+            print("[ИНФО] Файл КТП найден!")
+        except Exception as e:
+            print(f"[ОШИБКА] Что-то пошло не так при поиске файла КТП: {e}")
+    elif len(excel_files) == 0:
+        print("[ОШИБКА] Файл КТП не найден")
+    else:
+        print("[ОШИБКА] Найдено несколько файлов КТП. Пожалуйста, оставьте только один файл")

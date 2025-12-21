@@ -3,14 +3,18 @@ import openpyxl
 from openpyxl.utils.cell import coordinate_from_string, column_index_from_string, get_column_letter
 
 def get_cell_value(sheet, cell_ref: str):
-    """Gets cell value from Worksheet by reference (e.g., 'A1')."""
+    """
+    Gets cell value from Worksheet by reference (e.g., 'A1').
+    """
     try:
         return sheet[cell_ref].value
     except Exception:
         return None
 
 def generate_sequence(sheet, start_cell: str, mode: str) -> list:
-    """Generates a sequence of non-empty cell references from Worksheet."""
+    """
+    Generates a sequence of non-empty cell references from Worksheet.
+    """
     sequence = []
     empty_cell_counter = 0
     MAX_EMPTY_CELLS_IN_A_ROW = 5
@@ -51,7 +55,9 @@ def generate_sequence(sheet, start_cell: str, mode: str) -> list:
     return sequence
 
 def read_topics_from_excel(file_path: str, start_cell: str, mode: str) -> list[str]:
-    """Helper to read all topics from the excel file."""
+    """
+    Helper to read all topics from the excel file.
+    """
     try:
         # Load workbook and select active sheet
         wb = openpyxl.load_workbook(file_path, data_only=True)
