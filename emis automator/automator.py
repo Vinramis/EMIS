@@ -6,7 +6,7 @@ try:
     from config_manager import ConfigManager
     import file_utils
     import excel_utils
-except ImportError as e:
+except Exception as e:
     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось импортировать модули: {e}")
     print("(?) Кажется, вы запустили программу неправильно. Попробуйте заново.")
     sys.exit(1)
@@ -32,13 +32,11 @@ def run_automation():
         print("Выполняется вход...")
         try:
             page.locator(cfg.ONE_ID_BUTTON_SELECTOR).click()
-            time.sleep(0.2)
+            time.sleep(0.1)
             page.get_by_placeholder(cfg.LOGIN_FIELD_PLACEHOLDER).fill(cfg.LOGIN)
-            time.sleep(0.2)
             page.get_by_placeholder(cfg.PASSWORD_FIELD_PLACEHOLDER).fill(cfg.PASSWORD)
-            time.sleep(0.2)
+            time.sleep(0.1)
             page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
-            time.sleep(0.2)
             page.wait_for_url(cfg.SUCCESS_URL)
             print("Вход выполнен успешно!")
         except Exception as e:
@@ -47,14 +45,13 @@ def run_automation():
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
-        topic_names = excel_utils.read_topics_from_excel(
-            cfg.TOPICS_FILE_PATH, cfg.START_CELL, cfg.MODE
-        )
+        topic_names = excel_utils.read_topics_from_excel(cfg.TOPICS_FILE_PATH, cfg.START_CELL, cfg.MODE)
+        time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
+        time.sleep(0.5)
 
         # 5. Цикл автоматизации
         print("Запуск автоматизации...")
-        time.sleep(1)
         page.goto(cfg.NEW_TOPIC_URL)
 
         if cfg.LINE_COUNT < cfg.START_FROM_LINE:
