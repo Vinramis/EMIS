@@ -1,57 +1,40 @@
 
-import pandas as pd
+import openpyxl
+from openpyxl.utils.cell import coordinate_from_string, column_index_from_string, get_column_letter
 
-def next_col(col):
-    """Increments Excel column letter (A -> B, Z -> AA)."""
-    result = list(col)
-    i = len(result) - 1
-    while i >= 0:
-        if result[i] != 'Z':
-            result[i] = chr(ord(result[i]) + 1)
-            return ''.join(result)
-        else:
-            result[i] = 'A'
-            i -= 1
-    return 'A' + ''.join(result)
-
-def get_cell_value(data: pd.DataFrame, cell_ref: str):
-    """Gets cell value from DataFrame by reference (e.g., 'A1')."""
-    col = ''.join(filter(str.isalpha, cell_ref)).upper()
+def get_cell_value(sheet, cell_ref: str):
+    """Gets cell value from Worksheet by reference (e.g., 'A1')."""
     try:
-        row_digits = ''.join(filter(str.isdigit, cell_ref))
-        if not row_digits:
-            return None
-        row = int(row_digits) - 1
-    except ValueError:
+        return sheet[cell_ref].value
+    except Exception:
         return None
 
-    col_index = 0
-    for c in col:
-        col_index = col_index * 26 + (ord(c) - ord('A') + 1)
-    col_index -= 1
-
-    if 0 <= row < len(data) and 0 <= col_index < len(data.columns):
-        return data.iat[row, col_index]
-    return None
-
-def generate_sequence(data: pd.DataFrame, start_cell: str, mode: str) -> list:
-    """Generates a sequence of non-empty cell references from DataFrame."""
+def generate_sequence(sheet, start_cell: str, mode: str) -> list:
+    """Generates a sequence of non-empty cell references from Worksheet."""
     sequence = []
     empty_cell_counter = 0
     MAX_EMPTY_CELLS_IN_A_ROW = 5
 
-    current_col = ''.join(filter(str.isalpha, start_cell)).upper()
     try:
-        current_row = int(''.join(filter(str.isdigit, start_cell)))
+        # Parse start_cell (e.g., 'A1') into column letter and row number
+        xy = coordinate_from_string(start_cell) 
+        current_col_letter = xy[0]
+        current_row = xy[1]
+        
+        # Convert column letter to index (1-based) for easier manipulation
+        current_col_idx = column_index_from_string(current_col_letter)
+        
     except ValueError:
         return []
 
     while empty_cell_counter < MAX_EMPTY_CELLS_IN_A_ROW:
-        cell_ref = f"{current_col}{current_row}"
-        cell_value = get_cell_value(data, cell_ref)
-
-        is_empty = pd.isna(cell_value) or len(str(cell_value).strip()) < 2
-
+        current_col_letter = get_column_letter(current_col_idx)
+        cell_ref = f"{current_col_letter}{current_row}"
+        
+        cell_value = get_cell_value(sheet, cell_ref)
+        # Check if empty or too short (similar to original logic)
+        is_empty = cell_value is None or len(str(cell_value).strip()) < 2
+        
         if is_empty:
             empty_cell_counter += 1
         else:
@@ -61,7 +44,7 @@ def generate_sequence(data: pd.DataFrame, start_cell: str, mode: str) -> list:
         if mode == "col":
             current_row += 1
         elif mode == "row":
-            current_col = next_col(current_col)
+            current_col_idx += 1
         else:
             break
 
@@ -70,9 +53,18 @@ def generate_sequence(data: pd.DataFrame, start_cell: str, mode: str) -> list:
 def read_topics_from_excel(file_path: str, start_cell: str, mode: str) -> list[str]:
     """Helper to read all topics from the excel file."""
     try:
-        df = pd.read_excel(file_path, header=None)
-        cell_sequence = generate_sequence(df, start_cell, mode)
-        values = [str(get_cell_value(df, cell_ref)).strip() for cell_ref in cell_sequence]
+        # Load workbook and select active sheet
+        wb = openpyxl.load_workbook(file_path, data_only=True)
+        sheet = wb.active
+        
+        cell_sequence = generate_sequence(sheet, start_cell, mode)
+        
+        values = []
+        for cell_ref in cell_sequence:
+            val = get_cell_value(sheet, cell_ref)
+            if val is not None:
+                values.append(str(val).strip())
+                
         return values
     except Exception as e:
         print(f"[ОШИБКА] Чтение файла Excel: {e}")
