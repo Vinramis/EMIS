@@ -22,6 +22,7 @@ echo Обновление компонентов в отдельном окне.
 TIMEOUT /T 1 >nul
 echo (?) Если вы закроете окно, на появившийся вопрос ответьте "N"
 TIMEOUT /T 1 >nul
+
 start /wait dependencies_installer.cmd
 if errorlevel 0 (
     echo [ИНФО] Компоненты обновлены успешно
