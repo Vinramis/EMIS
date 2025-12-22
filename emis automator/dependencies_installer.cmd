@@ -2,6 +2,9 @@
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 
+:: Title
+TITLE Менеджер зависимостей
+
 
 
 :: Doesn't work as intended
@@ -26,8 +29,8 @@ set "PYTHON_PATH="python314\python""
 set "PIP_PATH="python314\Scripts\pip""
 
 echo.
-echo [ИНФО] Обновляем библиотеки (всего 2)...
-echo (?) Можете закрыть окно, если это занимает слишком много времени
+echo [ИНФО] Обновляем компоненты (всего 3)...
+echo (?) Можете закрыть это окно, если обновление занимает слишком много времени
 echo.
 
 echo (?) Библиотека Playwright нужна для работы с веб-браузером
@@ -43,18 +46,12 @@ TIMEOUT /T 1 >nul
 echo Библиотека OpenPyXL обновлена.
 
 echo.
-TIMEOUT /T 1 >nul
-echo [ИНФО] Все библиотеки обновлены.
 
-:: Install WebKit engine
-echo.
-echo.
-echo [ИНФО] Обновляем зависимость (WebKit)...
-TIMEOUT /T 1 >nul
 echo (?) WebKit - это браузер, который будет использоваться для автоматизации
-TIMEOUT /T 1 >nul
 !PYTHON_PATH! -m playwright install webkit >nul
-echo [ИНФО] Зависимость обновлена.
+TIMEOUT /T 1 >nul
+echo WebKit обновлен.
+
 echo.
 
 :: Close window / Next process
@@ -62,6 +59,5 @@ echo.
 echo (?) Обновление завершено!
 echo [ИНФО] Закрываем окно...
 echo.
-TIMEOUT /T 1 >nul
-@REM pause >nul
+TIMEOUT /T 3 >nul
 exit
