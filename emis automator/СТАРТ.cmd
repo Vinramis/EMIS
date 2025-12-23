@@ -15,22 +15,27 @@ echo.
 echo.
 echo.
 
-:: Update dependencies
-echo. & TIMEOUT /T 1 >nul
-echo ---------------------------------------------------
-echo Обновление компонентов в отдельном окне...
-TIMEOUT /T 1 >nul
-echo (?) Если вы закроете второе окно, на появившийся здесь вопрос ответьте "N"
-TIMEOUT /T 1 >nul
 
-start /wait dependencies_installer.cmd
-if errorlevel 0 (
-    echo [ИНФО] Компоненты обновлены успешно
-) else (
-    echo [ИНФО] Компоненты не обновлены
-)
-TIMEOUT /T 1 >nul
+@REM DEPRECATED
+@REM :: Update dependencies
+@REM echo. & TIMEOUT /T 1 >nul
+@REM echo ---------------------------------------------------
+@REM echo Обновление компонентов в отдельном окне...
+@REM TIMEOUT /T 1 >nul
+@REM echo (?) Если вы закроете второе окно, на появившийся здесь вопрос ответьте "N"
+@REM TIMEOUT /T 1 >nul
+
+@REM start /wait dependencies_installer.cmd
+@REM if errorlevel 0 (
+@REM     echo [ИНФО] Компоненты обновлены успешно
+@REM ) else (
+@REM     echo [ИНФО] Компоненты не обновлены
+@REM )
+@REM TIMEOUT /T 1 >nul
+
 
 :: Setup
-::     To be separated into a different file
+::     To be separated into a different file from setup_automator.cmd
+
+:: Run
 setup_automator.cmd
