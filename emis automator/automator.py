@@ -114,7 +114,7 @@ def run_automation():
                     break
                 continue
 
-        time.sleep(1)
+        # time.sleep(1)
 
 if __name__ == "__main__":
     try:
