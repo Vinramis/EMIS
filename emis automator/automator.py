@@ -9,6 +9,7 @@ try:
 except Exception as e:
     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Не удалось импортировать модули: {e}")
     print("(?) Кажется, вы запустили программу неправильно. Попробуйте заново.")
+    pause = input("Нажмите Enter...")
     sys.exit(1)
 
 def run_automation():
