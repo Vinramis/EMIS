@@ -68,4 +68,4 @@
 
 - Как получить ответ на вопрос, которого здесь нет?
 
-Ответ: Задайте мне его в Telegram по ссылке [https://t.me/vinramis](https://t.me/vinramis)
+Ответ: Задайте мне его в [Telegram](https://t.me/vinramis), пожалуйста **:)**
