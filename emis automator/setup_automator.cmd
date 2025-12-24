@@ -2,7 +2,7 @@
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 :: Define python path
-set "PYTHON_PATH="python314\python""
+set "PYTHON="python314\python""
 
 :: --- Check for existing config file ---
 echo.
@@ -141,7 +141,7 @@ echo Сохранение конфигурации...
 ) > tmp_config.json
 
 :: Add credentials to the JSON file
-!PYTHON_PATH! -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul
+!PYTHON! -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul
 del tmp_config.json
 
 TIMEOUT /T 1 >nul
@@ -156,12 +156,12 @@ echo Настройка завершена. Запускаем автомати�
 echo.
 echo.
 
-!PYTHON_PATH! automator.py
+!PYTHON! automator.py
 
 :: Closing window
 echo.
 echo.
-echo Кажется, браузер закрыт. Нажмите любую клавишу для выхода...
+echo Кажется, браузер закрыт. Нажмите Enter для выхода...
 echo (?) Или можно просто закрыть это окно
 echo.
 echo.
