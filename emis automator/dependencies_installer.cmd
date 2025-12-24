@@ -25,8 +25,8 @@ TITLE Менеджер зависимостей
 
 
 
-set "PYTHON_PATH="python314\python""
-set "PIP_PATH="python314\Scripts\pip""
+set "PYTHON="python314\python""
+set "PIP="python314\Scripts\pip""
 
 echo.
 echo [ИНФО] Обновляем компоненты (всего 3)...
@@ -34,21 +34,21 @@ echo (?) Можете закрыть это окно, если обновлен�
 echo.
 
 echo (?) Библиотека Playwright нужна для работы с веб-браузером
-!PIP_PATH! install playwright --no-warn-script-location >nul
+!PIP! install playwright --no-warn-script-location >nul
 TIMEOUT /T 1 >nul
 echo Библиотека Playwright обновлена. 
 
 echo.
 
 echo (?) Библиотека OpenPyXL нужна для работы с Excel
-!PIP_PATH! install openpyxl --no-warn-script-location >nul
+!PIP! install openpyxl --no-warn-script-location >nul
 TIMEOUT /T 1 >nul
 echo Библиотека OpenPyXL обновлена.
 
 echo.
 
 echo (?) WebKit - это браузер, который будет использоваться для автоматизации
-!PYTHON_PATH! -m playwright install webkit >nul
+!PYTHON! -m playwright install webkit >nul
 TIMEOUT /T 1 >nul
 echo WebKit обновлен.
 
