@@ -50,23 +50,22 @@ def find_file_by_prefix(directory: str, prefix: str):
         return None
     return None
 
-def find_file_by_count(directory: str, count: int):
+def numbers_in_string(string: str) -> list[int]:
+    numbers_found = []
+    number_buffer = ""
+    for char in string:
+        if char.isdigit():
+            number_buffer += char
+        else:
+            if number_buffer:
+                numbers_found.append(int(number_buffer))
+                number_buffer = ""
+    return numbers_found
+
+def find_file_by_count(directory: str, count: int) -> str | None:
     """
     Finds the file in the directory with the given count.
     """
-
-    def numbers_in_string(string: str):
-        numbers_found = []
-        number_buffer = ""
-        for char in string:
-            if char.isdigit():
-                number_buffer += char
-            else:
-                if number_buffer:
-                    numbers_found.append(int(number_buffer))
-                    number_buffer = ""
-        return numbers_found
-
     try:
         for filename in os.listdir(directory):
             if numbers_in_string(filename)[0] == count:
@@ -153,7 +152,6 @@ def rename_single_excel(new_name="КТП.xlsx"):
         # Avoid renaming if it's already named correctly
         if old_name == new_name:
             return
-            
         try:
             os.rename(old_name, new_name)
             print("[ИНФО] Файл КТП найден!")
@@ -163,3 +161,19 @@ def rename_single_excel(new_name="КТП.xlsx"):
         print("[ОШИБКА] Файл КТП не найден")
     else:
         print("[ОШИБКА] Найдено несколько файлов КТП. Пожалуйста, оставьте только один файл")
+
+def get_numerical_interval(directory: str) -> tuple[int, int]:
+    """
+    Returns the numerical interval of numerated files in the directory.
+    """
+    # 1. Get list of all files in the given directory
+    files = os.listdir(directory)
+    
+    # 2. Filter for files that start with a number
+    numerated_files = [f for f in files if numbers_in_string(f) != []]
+
+    # 3. Get the numerical interval of the files
+    numbers = [numbers_in_string(f)[0] for f in numerated_files]
+    
+    # 4. Return the numerical interval of the files
+    return min(numbers), max(numbers)

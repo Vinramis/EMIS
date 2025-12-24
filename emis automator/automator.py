@@ -19,6 +19,13 @@ def run_automation():
     # 2. Организация файлов
     cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER = file_utils.organize_files(cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER)
 
+
+
+    # TEMPORARY
+    cfg.START_FROM_LINE, cfg.END_ON_LINE = file_utils.get_numerical_interval(cfg.TOPICS_FOLDER)
+
+
+
     # 3. Автоматизация браузера
     with sync_playwright() as p:
         browser = p.webkit.launch(headless=False)
@@ -56,7 +63,7 @@ def run_automation():
         print("Запуск автоматизации...")
         page.goto(cfg.NEW_TOPIC_URL)
 
-        actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE
+        actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE + 1
         counter = -1
 
         for current_topic_number in range(cfg.START_FROM_LINE, cfg.END_ON_LINE + 1):

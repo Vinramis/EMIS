@@ -58,12 +58,13 @@ if not defined LOGIN set "LOGIN=!EXISTING_LOGIN!"
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 
 :GATHER_SETTINGS
-echo.
-echo.
-echo --- Параметры автоматизации ---
-echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
-echo (?) Значения по умолчанию показаны в квадратных скобках
-echo.
+@REM DEPRECATED
+@REM echo.
+@REM echo.
+@REM echo --- Параметры автоматизации ---
+@REM echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
+@REM echo (?) Значения по умолчанию показаны в квадратных скобках
+@REM echo.
 
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_START_CELL=B6"
@@ -84,11 +85,13 @@ set "START_CELL="
 if not defined START_CELL set "START_CELL=%DEFAULT_START_CELL%"
 
 set "START_FROM_LINE="
-set /p "START_FROM_LINE=С какой темы начать обработку (номером) [%DEFAULT_START_FROM_LINE%]: "
+@REM DEPRECATED
+@REM set /p "START_FROM_LINE=С какой темы начать обработку (номером) [%DEFAULT_START_FROM_LINE%]: "
 if not defined START_FROM_LINE set "START_FROM_LINE=%DEFAULT_START_FROM_LINE%"
 
 set "END_ON_LINE="
-set /p "END_ON_LINE=На какой теме закончить обработку (номером) [%DEFAULT_END_ON_LINE%]: "
+@REM DEPRECATED
+@REM set /p "END_ON_LINE=На какой теме закончить обработку (номером) [%DEFAULT_END_ON_LINE%]: "
 if not defined END_ON_LINE set "END_ON_LINE=%DEFAULT_END_ON_LINE%"
 
 set "MODE_INPUT="

@@ -22,7 +22,7 @@ for /d /r "%PYTHON_PATH%" %%d in (pycache) do @if exist "%%d" rd /s /q "%%d"
 :: Block 3. Delete large unnecessary libraries
 rd /s /q "%PYTHON_PATH%\Lib\tkinter" 2>nul
 rd /s /q "%PYTHON_PATH%\Lib\unittest" 2>nul
-rd /s /q "%PYTHON_PATH%\Lib\sqlite3" 2>nul
+@REM rd /s /q "%PYTHON_PATH%\Lib\sqlite3" 2>nul
 rd /s /q "%PYTHON_PATH%\Lib\lib2to3" 2>nul
 rd /s /q "%PYTHON_PATH%\Lib\dbm" 2>nul
 rd /s /q "%PYTHON_PATH%\Lib\curses" 2>nul
