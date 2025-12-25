@@ -1,4 +1,4 @@
-.vscode
+# .vscode
 __pycache__
 publication variants
 test.cmd
@@ -10,4 +10,4 @@ emis automator/КТП.xlsx
 emis automator/python314
 smart clipboard/data.xlsx
 emis automator/backup.json
-emis automator/BACKUP_python314
+emis automator/structure
