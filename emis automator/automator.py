@@ -16,15 +16,9 @@ def run_automation():
     # 1. Загрузка конфигурации
     cfg = ConfigManager()
 
-    # 2. Организация файлов
-    cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER = file_utils.organize_files(cfg.TOPICS_FOLDER, cfg.HOMEWORK_FOLDER)
-
-
-
-    # TEMPORARY
-    cfg.START_FROM_LINE, cfg.END_ON_LINE = file_utils.get_numerical_interval(cfg.TOPICS_FOLDER)
-
-
+    # 2. Определение интервала
+    cfg.START_FROM_LINE, cfg.END_ON_LINE = file_utils.get_numerical_interval(cfg.CLASSWORK_FOLDER)
+    cfg.sync_config()
 
     # 3. Автоматизация браузера
     with sync_playwright() as p:
@@ -49,6 +43,8 @@ def run_automation():
             print("Вход выполнен успешно!")
         except Exception as e:
             print(f"[ОШИБКА] Вход не удался: {e}")
+            cfg.VALIDITY = -1
+            cfg.sync_config()
             return
 
         # 4. Подготовка данных
@@ -73,11 +69,11 @@ def run_automation():
             topic_name = topic_names[current_topic_number - 1] # current_topic_number and not counter, because topic_names contains all topics, not only which we need to fill
 
             # Поиск файлов
-            topic_file_path = file_utils.find_file_by_count(cfg.TOPICS_FOLDER, current_topic_number)
+            topic_file_path = file_utils.find_file_by_count(cfg.CLASSWORK_FOLDER, current_topic_number)
             homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, current_topic_number)
 
             if not topic_file_path:
-                print(f"[ОШИБКА] Файл классной работы отсутствует в папке '{cfg.TOPICS_FOLDER}'")
+                print(f"[ОШИБКА] Файл классной работы отсутствует в папке '{cfg.CLASSWORK_FOLDER}'")
             if not homework_file_path:
                 print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
 

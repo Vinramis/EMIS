@@ -9,18 +9,24 @@ echo.
 echo ---------------------------------------------------
 echo Проверка конфигурации...
 if exist "config.json" (
-    set "USE_EXISTING="
-    set /p "USE_EXISTING=Конфигурация уже существует, использовать её? (введите 1 и нажмите Enter для нет или оставьте пустым и нажмите Enter для да): "
-    TIMEOUT /T 1 >nul
-    
-    if "!USE_EXISTING!"=="1" (
-        echo Перенастройка параметров...
+    :: Check for validity key in config.json
+    for /f "tokens=2 delims=: " %%a in ('findstr /R /C:"validity" "config.json"') do set "EXISTING_VALIDITY=%%~a"
+    if "!EXISTING_VALIDITY!"=="-1" (
+        echo Прошлый вход не удался, перенастройка...
         goto :RECONFIGURE
-    ) else (
+    ) else if "!EXISTING_VALIDITY!"=="1" (
         echo Используется существующая конфигурация.
         goto :LAUNCH_AUTOMATOR
+    ) else (
+        echo Конфигурация не найдена.
+        goto :CONFIGURE
     )
 ) else (
+    @REM Create config.json
+    (
+        echo.
+    ) > config.json
+    :CONFIGURE
     echo.
     echo --- Учетные данные ---
 
@@ -41,8 +47,8 @@ echo (?) Существующие учетные данные показаны �
 echo.
 
 :: Parsing existing credentials
-for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"login\"" "config.json"') do set "EXISTING_LOGIN=%%~a"
-for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"password\"" "config.json"') do set "EXISTING_PASSWORD=%%~a"
+for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"login" "config.json"') do set "EXISTING_LOGIN=%%~a"
+for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"password" "config.json"') do set "EXISTING_PASSWORD=%%~a"
 :: Remove quotes
 set "EXISTING_LOGIN=!EXISTING_LOGIN:"=!"
 set "EXISTING_PASSWORD=!EXISTING_PASSWORD:"=!"
@@ -67,12 +73,18 @@ if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 @REM echo.
 
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
+set "DEFAULT_INPUT_DATA_DB_PATH=config.db"
+set "DEFAULT_TOPICS_FOLDER=КЛ"
+set "DEFAULT_HOMEWORK_FOLDER=ДЗ"
 set "DEFAULT_START_CELL=B6"
 set DEFAULT_START_FROM_LINE=1
 set DEFAULT_END_ON_LINE=6
 set "DEFAULT_MODE=col"
-set "DEFAULT_TOPICS_FOLDER=КЛ"
-set "DEFAULT_HOMEWORK_FOLDER=ДЗ"
+
+set "INPUT_DATA_DB_PATH="
+@REM DEPRECATED
+@REM set /p "INPUT_DATA_DB_PATH=Введите путь к файлу базы данных [%DEFAULT_INPUT_DATA_DB_PATH%]: "
+if not defined INPUT_DATA_DB_PATH set "INPUT_DATA_DB_PATH=%DEFAULT_INPUT_DATA_DB_PATH%"
 
 set "TOPICS_FILE_PATH="
 @REM DEPRECATED
@@ -118,6 +130,7 @@ if not defined HOMEWORK_FOLDER set "HOMEWORK_FOLDER=%DEFAULT_HOMEWORK_FOLDER%"
 
 :: --- Escape backslashes for JSON compatibility ---
 set "JSON_TOPICS_FILE_PATH=!TOPICS_FILE_PATH:\=\\!"
+set "JSON_INPUT_DATA_DB_PATH=!INPUT_DATA_DB_PATH:\=\\!"
 set "JSON_TOPICS_FOLDER=!TOPICS_FOLDER:\=\\!"
 set "JSON_HOMEWORK_FOLDER=!HOMEWORK_FOLDER:\=\\!"
 
@@ -128,28 +141,28 @@ echo Сохранение конфигурации...
 
 (
     echo {
+    echo     "credentials": {
+    echo         "login": "!LOGIN!",
+    echo         "password": "!PASSWORD!",
+    echo         "validity": 1
+    echo     },
     echo     "automation_settings": {
     echo         "TOPICS_FILE_PATH": "!JSON_TOPICS_FILE_PATH!",
+    echo         "INPUT_DATA_DB_PATH": "!JSON_INPUT_DATA_DB_PATH!",
+    echo         "CLASSWORK_FOLDER": "!JSON_TOPICS_FOLDER!",
+    echo         "HOMEWORK_FOLDER": "!JSON_HOMEWORK_FOLDER!",
     echo         "START_CELL": "!START_CELL!",
     echo         "START_FROM_LINE": !START_FROM_LINE!,
     echo         "END_ON_LINE": !END_ON_LINE!,
-    echo         "MODE": "!MODE!",
-    echo         "TOPICS_FOLDER": "!JSON_TOPICS_FOLDER!",
-    echo         "HOMEWORK_FOLDER": "!JSON_HOMEWORK_FOLDER!"
+    echo         "MODE": "!MODE!"
     echo     }
     echo }
-) > tmp_config.json
+) > config.json
 
-:: Add credentials to the JSON file
-!PYTHON! -c "import json; d=json.load(open('tmp_config.json')); d['credentials']={'login':'!LOGIN!','password':'!PASSWORD!'}; json.dump(d, open('config.json','w'), indent=4, ensure_ascii=False)" >nul
-del tmp_config.json
-
-TIMEOUT /T 1 >nul
 echo Конфигурация успешно сохранена.
 
 
 :LAUNCH_AUTOMATOR
-:: --- Launch Automator ---
 echo.
 echo ---------------------------------------------------
 echo Настройка завершена. Запускаем автоматизатор...
