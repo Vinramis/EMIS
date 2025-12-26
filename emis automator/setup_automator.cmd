@@ -8,7 +8,6 @@ if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 set "PYTHON="components\python314\python""
 :: Set title
 TITLE Автоматизатор EMIS v0.7
-
 :: Welcome user
 echo.
 echo.
@@ -78,14 +77,6 @@ if not defined LOGIN set "LOGIN=!EXISTING_LOGIN!"
 if not defined PASSWORD set "PASSWORD=!EXISTING_PASSWORD!"
 
 :GATHER_SETTINGS
-@REM DEPRECATED
-@REM echo.
-@REM echo.
-@REM echo --- Параметры автоматизации ---
-@REM echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
-@REM echo (?) Значения по умолчанию показаны в квадратных скобках
-@REM echo.
-
 set "DEFAULT_TOPICS_FILE_PATH=КТП.xlsx"
 set "DEFAULT_INPUT_DATA_DB_PATH=config.db"
 set "DEFAULT_TOPICS_FOLDER=КЛ"
@@ -94,6 +85,16 @@ set "DEFAULT_START_CELL=B6"
 set DEFAULT_START_FROM_LINE=1
 set DEFAULT_END_ON_LINE=6
 set "DEFAULT_MODE=col"
+
+
+@REM DEPRECATED
+@REM echo.
+@REM echo.
+@REM echo --- Параметры автоматизации ---
+@REM echo (?) Оставьте пустым и нажмите Enter, чтобы сохранить значения по умолчанию
+@REM echo (?) Значения по умолчанию показаны в квадратных скобках
+@REM echo.
+
 
 set "INPUT_DATA_DB_PATH="
 @REM DEPRECATED
