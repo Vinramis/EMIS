@@ -2,15 +2,15 @@
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
 :: Define python path
-set "PYTHON="python314\python""
+set "PYTHON="components\python314\python""
 
 :: --- Check for existing config file ---
 echo.
 echo ---------------------------------------------------
 echo Проверка конфигурации...
-if exist "config.json" (
+if exist "components\config.json" (
     :: Check for validity key in config.json
-    for /f "tokens=2 delims=: " %%a in ('findstr /R /C:"validity" "config.json"') do set "EXISTING_VALIDITY=%%~a"
+    for /f "tokens=2 delims=: " %%a in ('findstr /R /C:"validity" "components\config.json"') do set "EXISTING_VALIDITY=%%~a"
     if "!EXISTING_VALIDITY!"=="-1" (
         echo Прошлый вход не удался, перенастройка...
         goto :RECONFIGURE
@@ -25,7 +25,7 @@ if exist "config.json" (
     @REM Create config.json
     (
         echo.
-    ) > config.json
+    ) > components\config.json
     :CONFIGURE
     echo.
     echo --- Учетные данные ---
@@ -157,7 +157,7 @@ echo Сохранение конфигурации...
     echo         "MODE": "!MODE!"
     echo     }
     echo }
-) > config.json
+) > components\config.json
 
 echo Конфигурация успешно сохранена.
 
@@ -169,7 +169,7 @@ echo Настройка завершена. Запускаем автомати�
 echo.
 echo.
 
-!PYTHON! automator.py
+!PYTHON! components/automator.py
 
 :: Closing window
 echo.
