@@ -16,8 +16,10 @@ def run_automation():
     # 1. Загрузка конфигурации
     cfg = ConfigManager()
 
-    # 2. Определение интервала
-    cfg.START_FROM_LINE, cfg.END_ON_LINE = file_utils.get_numerical_interval(cfg.CLASSWORK_FOLDER)
+    # 2. Определение наибольшего интервала
+    classwork_interval = file_utils.get_numerical_interval(cfg.CLASSWORK_FOLDER)
+    homework_interval = file_utils.get_numerical_interval(cfg.HOMEWORK_FOLDER)
+    cfg.START_FROM_LINE, cfg.END_ON_LINE = min(classwork_interval[0], homework_interval[0]), max(classwork_interval[1], homework_interval[1])
     cfg.sync_config()
 
     # 3. Автоматизация браузера

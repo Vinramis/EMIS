@@ -1,11 +1,10 @@
 
 import json
-# import sys
 import os
 
 class ConfigManager:
     def __init__(self, config_path='config.json'):
-        self.config_path = config_path
+        self.origin_config_path = config_path
 
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
@@ -13,6 +12,9 @@ class ConfigManager:
         except FileNotFoundError:
             # If config.json doesn't exist, create it
             self.create_config()
+        # except json.JSONDecodeError:
+        #     # If config.json is invalid, create it
+        #     self.create_config()
 
         # Credentials
         self.credentials = self.get("credentials")
@@ -70,7 +72,7 @@ class ConfigManager:
                 "MODE": ""
             }
         }
-        os.mkdir(os.path.dirname(self.config_path))
+        os.mkdir(os.path.dirname(self.origin_config_path))
 
     def sync_config(self):
         self.configuration["credentials"] = {
@@ -89,5 +91,5 @@ class ConfigManager:
             "MODE": self.MODE
         }
 
-        with open(self.config_path, 'w', encoding='utf-8') as f:
+        with open(self.origin_config_path, 'w', encoding='utf-8') as f:
             json.dump(self.configuration, f, ensure_ascii=False, indent=4)
