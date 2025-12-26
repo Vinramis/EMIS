@@ -3,7 +3,7 @@ import sys
 
 try:
     from playwright.sync_api import sync_playwright
-    from config_manager import ConfigManager
+    from config_manager import JsonTwin
     import file_utils
     import excel_utils
 except Exception as e:
@@ -14,13 +14,16 @@ except Exception as e:
 
 def run_automation():
     # 1. Загрузка конфигурации
-    cfg = ConfigManager()
+    global cfg
+    cfg = JsonTwin('config.json')
+    settings = cfg.get("settings")
+
 
     # 2. Определение наибольшего интервала
-    classwork_interval = file_utils.get_numerical_interval(cfg.CLASSWORK_FOLDER)
-    homework_interval = file_utils.get_numerical_interval(cfg.HOMEWORK_FOLDER)
-    cfg.START_FROM_LINE, cfg.END_ON_LINE = min(classwork_interval[0], homework_interval[0]), max(classwork_interval[1], homework_interval[1])
-    cfg.sync_config()
+    classwork_interval: tuple[int, int] = file_utils.get_numerical_interval(settings.get("classwork_folder"))
+    homework_interval: tuple[int, int] = file_utils.get_numerical_interval(settings.get("homework_folder"))
+    cfg.set("settings", "start_from_line", min(classwork_interval[0], homework_interval[0]))
+    cfg.set("settings", "end_on_line", max(classwork_interval[1], homework_interval[1]))
 
     # 3. Автоматизация браузера
     with sync_playwright() as p:
@@ -28,60 +31,63 @@ def run_automation():
         page = browser.new_page()
         time.sleep(0.2)
 
+        web = JsonTwin("web.json")
+        selectors = JsonTwin(web.get("constants"))
+
         print("Переход на страницу входа...")
-        page.goto(cfg.ONE_ID_LOGIN_URL)
+        page.goto(selectors.get("one_id_login_url"))
         time.sleep(0.2)
 
         # Вход
         print("Выполняется вход...")
         try:
-            page.locator(cfg.ONE_ID_BUTTON_SELECTOR).click()
+            page.locator(selectors.get("one_id_button_selector")).click()
             time.sleep(0.1)
-            page.get_by_placeholder(cfg.LOGIN_FIELD_PLACEHOLDER).fill(cfg.LOGIN)
-            page.get_by_placeholder(cfg.PASSWORD_FIELD_PLACEHOLDER).fill(cfg.PASSWORD)
+            page.get_by_placeholder(selectors.get("login_field_placeholder")).fill(settings.get("credentials", "login"))
+            page.get_by_placeholder(selectors.get("password_field_placeholder")).fill(settings.get("credentials", "password"))
             time.sleep(0.1)
-            page.get_by_text(cfg.LOGIN_BUTTON_TEXT).first.click()
-            page.wait_for_url(cfg.SUCCESS_URL)
+            page.get_by_text(selectors.get("login_button_text")).first.click()
+            page.wait_for_url(selectors.get("success_url"))
             print("Вход выполнен успешно!")
         except Exception as e:
             print(f"[ОШИБКА] Вход не удался: {e}")
-            cfg.VALIDITY = -1
-            cfg.sync_config()
+            cfg.set("credentials", "validity", -1)
+            cfg.sync()
             return
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
         file_utils.rename_single_excel()
-        topic_names = excel_utils.read_topics_from_excel(cfg.TOPICS_FILE_PATH, cfg.START_CELL, cfg.MODE)
+        topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"))
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
         time.sleep(0.5)
 
         # 5. Цикл автоматизации
         print("Запуск автоматизации...")
-        page.goto(cfg.NEW_TOPIC_URL)
+        page.goto(selectors.get("new_topic_url"))
 
-        actual_length = cfg.END_ON_LINE - cfg.START_FROM_LINE + 1
+        actual_length = settings.get("end_on_line") - settings.get("start_from_line") + 1
         counter = -1
 
-        for current_topic_number in range(cfg.START_FROM_LINE, cfg.END_ON_LINE + 1):
+        for current_topic_number in range(settings.get("start_from_line"), settings.get("end_on_line") + 1):
             counter += 1
             print(f"\n--- Обработка строки {counter + 1} из {actual_length} ---") # Counter + 1 because first element will be 1 AND we need to count which actual line we are on
 
             topic_name = topic_names[current_topic_number - 1] # current_topic_number and not counter, because topic_names contains all topics, not only which we need to fill
 
             # Поиск файлов
-            topic_file_path = file_utils.find_file_by_count(cfg.CLASSWORK_FOLDER, current_topic_number)
-            homework_file_path = file_utils.find_file_by_count(cfg.HOMEWORK_FOLDER, current_topic_number)
+            topic_file_path = file_utils.find_file_by_count(settings.get("classwork_folder"), current_topic_number)
+            homework_file_path = file_utils.find_file_by_count(settings.get("homework_folder"), current_topic_number)
 
             if not topic_file_path:
-                print(f"[ОШИБКА] Файл классной работы отсутствует в папке '{cfg.CLASSWORK_FOLDER}'")
+                print(f"[ОШИБКА] Файл классной работы отсутствует в папке '{settings.get("classwork_folder")}'")
             if not homework_file_path:
-                print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{cfg.HOMEWORK_FOLDER}'")
+                print(f"[ОШИБКА] Файл домашнего задания отсутствует в папке '{settings.get("homework_folder")}'")
 
             try:
                 print("Нажатие 'Добавить строку'...")
-                page.locator(cfg.ADD_LINE_BUTTON).click()
+                page.locator(selectors.get("add_line_button")).click()
                 time.sleep(0.1)
 
                 if not topic_name:
@@ -89,15 +95,15 @@ def run_automation():
                     sys.exit(1)
 
                 print(f"Заполнение названия темы: '{topic_name}'")
-                page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.TOPIC_NAME_SUFFIX}").fill(topic_name)
+                page.locator(selectors.get("topic_name_suffix")).fill(topic_name)
 
                 if topic_file_path:
                     print(f"Загрузка файла темы: {topic_file_path}")
-                    page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.TOPIC_FILE_SUFFIX}").set_input_files(topic_file_path)
+                    page.locator(selectors.get("topic_file_suffix")).set_input_files(topic_file_path)
 
                 if homework_file_path:
                     print(f"Загрузка файла домашнего задания: {homework_file_path}")
-                    page.locator(f"{cfg.TOPICS_PREFIX}{1000+counter}{cfg.HOMEWORK_FILE_SUFFIX}").set_input_files(homework_file_path)
+                    page.locator(selectors.get("homework_file_suffix")).set_input_files(homework_file_path)
 
             except Exception as e:
                 print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {current_topic_number}): {e}")
