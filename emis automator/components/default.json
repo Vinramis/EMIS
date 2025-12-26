@@ -1,0 +1,18 @@
+{
+    "cookies": "state.json",
+    "credentials": {
+        "login": "",
+        "password": "",
+        "validity": 0
+    },
+    "automation_settings": {
+        "TOPICS_FILE_PATH": "КТП.xlsx",
+        "INPUT_DATA_DB_PATH": "config.db",
+        "CLASSWORK_FOLDER": "../КЛ", 
+        "HOMEWORK_FOLDER": "../ДЗ",
+        "START_CELL": "B6",
+        "START_FROM_LINE": 1,
+        "END_ON_LINE": 6,
+        "MODE": "col"
+    }
+}
