@@ -1,8 +1,22 @@
 @echo off
 CHCP 65001 >nul
 setlocal enabledelayedexpansion
+
+:: Activate fullscreen mode
+if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 :: Define python path
 set "PYTHON="components\python314\python""
+:: Set title
+TITLE Автоматизатор EMIS v0.7
+
+:: Welcome user
+echo.
+echo.
+echo.
+echo === Добро пожаловать в Автоматизатор EMIS! ===
+echo.
+echo.
+echo.
 
 :: --- Check for existing config file ---
 echo.
@@ -141,6 +155,7 @@ echo Сохранение конфигурации...
 
 (
     echo {
+    echo     "cookies": "state.json",
     echo     "credentials": {
     echo         "login": "!LOGIN!",
     echo         "password": "!PASSWORD!",
