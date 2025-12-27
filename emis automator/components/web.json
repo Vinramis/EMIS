@@ -1,13 +1,32 @@
 {
     "constants": {
         "One_ID_login_url": "https://litsey.edu.uz/login",
-        "One_ID_login_button_selector": "#root > div > div > div > main > div > div > a",
+        "One_ID_button_selector": "#root > div > div > div > main > div > div > a",
         "login_field_placeholder": "Loginni kiriting",
         "password_field_placeholder": "Parolni kiriting",
         "login_button_text": "Kirish",
         "success_url": "https://litsey.edu.uz",
         "new_topic_url": "https://litsey.edu.uz/teacher/topics/add",
-        "": "",
+        "prefix": "#topics_",
+        "topic_name_postfix": "_name",
+        "topic_file_postfix": "_topic_file",
+        "homework_file_postfix": "_homework_file",
+        "add_line_button": ".Full"
+    },
+    "urls": {
+        "one_id_login": "https://litsey.edu.uz/login",
+        "success": "https://litsey.edu.uz",
+        "new_topic": "https://litsey.edu.uz/teacher/topics/add"
+    },
+    "selectors": {
+        "one_id_button": "#root > div > div > div > main > div > div > a"
+    },
+    "placeholders": {
+        "login_field": "Loginni kiriting",
+        "password_field": "Parolni kiriting",
+        "login_button": "Kirish"
+    },
+    "topics_lego": {
         "topics_prefix": "#topics_",
         "topic_name_postfix": "_name",
         "topic_file_postfix": "_topic_file",

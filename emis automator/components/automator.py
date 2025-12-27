@@ -16,7 +16,10 @@ def run_automation():
     # 1. Загрузка конфигурации
     global cfg
     cfg = JsonTwin('config.json')
+    autorisation = cfg.get("credentials")
     settings = cfg.get("settings")
+
+    selectors = JsonTwin("web.json").get("constants")
 
 
     # 2. Определение наибольшего интервала
@@ -31,23 +34,20 @@ def run_automation():
         page = browser.new_page()
         time.sleep(0.2)
 
-        web = JsonTwin("web.json")
-        selectors = JsonTwin(web.get("constants"))
-
         print("Переход на страницу входа...")
-        page.goto(selectors.get("one_id_login_url"))
+        page.goto(selectors.get("One_ID_login_url"))
         time.sleep(0.2)
 
         # Вход
         print("Выполняется вход...")
         try:
-            page.locator(selectors.get("one_id_button_selector")).click()
+            page.locator(selectors("One_ID_button_selector")).click()
             time.sleep(0.1)
-            page.get_by_placeholder(selectors.get("login_field_placeholder")).fill(settings.get("credentials", "login"))
-            page.get_by_placeholder(selectors.get("password_field_placeholder")).fill(settings.get("credentials", "password"))
+            page.get_by_placeholder(selectors("login_field_placeholder")).fill(autorisation("login"))
+            page.get_by_placeholder(selectors("password_field_placeholder")).fill(autorisation("password"))
             time.sleep(0.1)
-            page.get_by_text(selectors.get("login_button_text")).first.click()
-            page.wait_for_url(selectors.get("success_url"))
+            page.get_by_text(selectors("login_button_text")).first.click()
+            page.wait_for_url(selectors("success_url"))
             print("Вход выполнен успешно!")
         except Exception as e:
             print(f"[ОШИБКА] Вход не удался: {e}")
@@ -75,6 +75,9 @@ def run_automation():
             print(f"\n--- Обработка строки {counter + 1} из {actual_length} ---") # Counter + 1 because first element will be 1 AND we need to count which actual line we are on
 
             topic_name = topic_names[current_topic_number - 1] # current_topic_number and not counter, because topic_names contains all topics, not only which we need to fill
+            topic_name_selector = selectors.get("prefix") + str(1000+counter) + selectors.get("topic_name_postfix")
+            topic_file_selector = selectors.get("prefix") + str(1000+counter) + selectors.get("topic_file_postfix")
+            homework_file_selector = selectors.get("prefix") + str(1000+counter) + selectors.get("homework_file_postfix")
 
             # Поиск файлов
             topic_file_path = file_utils.find_file_by_count(settings.get("classwork_folder"), current_topic_number)
@@ -95,15 +98,15 @@ def run_automation():
                     sys.exit(1)
 
                 print(f"Заполнение названия темы: '{topic_name}'")
-                page.locator(selectors.get("topic_name_suffix")).fill(topic_name)
+                page.locator(topic_name_selector).fill(topic_name)
 
                 if topic_file_path:
                     print(f"Загрузка файла темы: {topic_file_path}")
-                    page.locator(selectors.get("topic_file_suffix")).set_input_files(topic_file_path)
+                    page.locator(topic_file_selector).set_input_files(topic_file_path)
 
                 if homework_file_path:
                     print(f"Загрузка файла домашнего задания: {homework_file_path}")
-                    page.locator(selectors.get("homework_file_suffix")).set_input_files(homework_file_path)
+                    page.locator(homework_file_selector).set_input_files(homework_file_path)
 
             except Exception as e:
                 print(f"[КРИТИЧЕСКАЯ ОШИБКА] на строке {counter + 1} (Элемент {current_topic_number}): {e}")
@@ -119,7 +122,7 @@ def run_automation():
             try:
                 if page.is_closed():
                     break
-                page.wait_for_event("close", timeout=1000)
+                page.wait_for_event("close")
             except Exception:
                 if page.is_closed():
                     break

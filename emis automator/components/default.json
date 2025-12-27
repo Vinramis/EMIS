@@ -6,10 +6,10 @@
         "validity": 0
     },
     "settings": {
-        "topics_file_path": "КТП.xlsx",
+        "topics_file_path": "..\\КТП.xlsx",
         "input_data_db_path": "config.db",
-        "classwork_folder": "../КЛ", 
-        "homework_folder": "../ДЗ",
+        "classwork_folder": "..\\КЛ", 
+        "homework_folder": "..\\ДЗ",
         "start_cell": "B6",
         "start_from_line": 1,
         "end_on_line": 6,

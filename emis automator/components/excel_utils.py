@@ -1,6 +1,7 @@
 
 import openpyxl
 from openpyxl.utils.cell import coordinate_from_string, column_index_from_string, get_column_letter
+from file_utils import noramlize_path
 
 def get_cell_value(sheet, cell_ref: str):
     """
@@ -58,6 +59,8 @@ def read_topics_from_excel(file_path: str, start_cell: str, mode: str, starting_
     Helper to read topics from the excel file.
     """
     try:
+        file_path = noramlize_path(file_path)
+        print(file_path)
         # Load workbook and select active sheet
         wb = openpyxl.load_workbook(file_path, data_only=True)
         sheet = wb.active

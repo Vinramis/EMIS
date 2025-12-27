@@ -66,6 +66,7 @@ def find_file_by_count(directory: str, count: int) -> str | None:
     """
     Finds the file in the directory with the given count.
     """
+    directory = noramlize_path(directory)
     try:
         for filename in os.listdir(directory):
             if numbers_in_string(filename)[0] == count:
@@ -166,6 +167,14 @@ def get_numerical_interval(directory: str) -> tuple[int, int]:
     """
     Returns the numerical interval of numerated files in the directory.
     """
+    current_file_folder = os.path.dirname(__file__) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\emis automator\components
+    if directory.startswith(".."):
+        directory = directory[3:] # ..\\КЛ
+        current_file_folder_parent = os.path.dirname(current_file_folder) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit
+        directory = os.path.join(current_file_folder_parent, directory) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\КЛ
+    else:
+        directory = os.path.join(current_file_folder, directory)
+
     # 1. Get list of all files in the given directory
     files = os.listdir(directory)
     
@@ -177,3 +186,16 @@ def get_numerical_interval(directory: str) -> tuple[int, int]:
     
     # 4. Return the numerical interval of the files
     return min(numbers), max(numbers)
+
+def noramlize_path(path: str) -> str:
+    """
+    Normalizes the path to the absolute path.
+    """
+    current_file_folder = os.path.dirname(__file__) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\emis automator\components
+    if path.startswith(".."):
+        path = path[3:] # ..\\КЛ
+        current_file_folder_parent = os.path.dirname(current_file_folder) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit
+        path = os.path.join(current_file_folder_parent, path) # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\КЛ
+    else:
+        path = os.path.join(current_file_folder, path)
+    return os.path.abspath(path)
