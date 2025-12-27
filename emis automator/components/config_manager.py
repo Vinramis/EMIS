@@ -3,7 +3,7 @@ import pathlib
 from file_utils import noramlize_path
 
 class JsonTwin:
-    def __init__(self, twin: str | dict | list = None):
+    def __init__(self, twin: dict | list | str = None):
         # 1. Initialize core attributes
         self._configuration = None
         self.twin_path = None
@@ -78,9 +78,12 @@ class JsonTwin:
     def __call__(self, key):
         return self.get(key)
 
-# How to set it so print(self) returns print(self._configuration)
     def __str__(self):
         return str(self._configuration)
+
+class DataBaseTwin:
+    def __init__(self, twin):
+        pass
 
 if __name__ == "__main__":
     # Test
