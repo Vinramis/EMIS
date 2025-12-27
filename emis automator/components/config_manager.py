@@ -1,8 +1,12 @@
-import json
 import pathlib
 from file_utils import noramlize_path
 
+import json
+import openpyxl
+import sqlite3
+
 class JsonTwin:
+
     def __init__(self, twin: dict | list | str = None):
         # 1. Initialize core attributes
         self._configuration = None
@@ -80,6 +84,10 @@ class JsonTwin:
 
     def __str__(self):
         return str(self._configuration)
+
+class ExcelTableTwin:
+    def __init__(self, twin):
+        pass 
 
 class DataBaseTwin:
     def __init__(self, twin):
