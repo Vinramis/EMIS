@@ -6,7 +6,6 @@ import openpyxl
 import sqlite3
 
 class JsonTwin:
-
     def __init__(self, twin: dict | list | str = None):
         # 1. Initialize core attributes
         self._configuration = None
