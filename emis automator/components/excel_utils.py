@@ -60,7 +60,7 @@ def read_topics_from_excel(file_path: str, start_cell: str, mode: str, starting_
     """
     try:
         file_path = noramlize_path(file_path)
-        print(file_path)
+        
         # Load workbook and select active sheet
         wb = openpyxl.load_workbook(file_path, data_only=True)
         sheet = wb.active

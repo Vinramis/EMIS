@@ -1,5 +1,6 @@
 import time
 import sys
+import pathlib
 
 try:
     from playwright.sync_api import sync_playwright
@@ -57,7 +58,10 @@ def run_automation():
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
-        file_utils.rename_single_excel()
+        if not pathlib.Path(settings.get("topics_file_path")).is_file():
+            folder = str(pathlib.Path(__file__).parent)
+            file_utils.rename_single_excel(folder)
+            
         topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"))
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")

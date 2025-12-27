@@ -136,12 +136,14 @@ def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
     
     return topics_folder, homework_folder
 
-def rename_single_excel(new_name="КТП.xlsx"):
+def rename_single_excel(path: str, new_name="КТП.xlsx"):
     """
     Renames the single .xlsx file in the current directory to the specified name.
     """
+    path = noramlize_path(path)
+
     # 1. Get list of all files in the current directory
-    files = os.listdir('.')
+    files = os.listdir(path)
     
     # 2. Filter for .xlsx files (ignoring temporary ~$ files created by Excel)
     excel_files = [f for f in files if f.endswith('.xlsx') and not f.startswith('~$')]
@@ -199,3 +201,10 @@ def noramlize_path(path: str) -> str:
     else:
         path = os.path.join(current_file_folder, path)
     return os.path.abspath(path)
+
+def pure_name(path: str) -> str:
+    """
+    Returns the pure name of the file.
+    """
+    path = noramlize_path(path)
+    return os.path.basename(path)
