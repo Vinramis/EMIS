@@ -59,8 +59,10 @@ def run_automation():
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
         if not pathlib.Path(settings.get("topics_file_path")).is_file():
-            folder = str(pathlib.Path(__file__).parent)
-            file_utils.rename_single_excel(folder)
+            current_file_folder = str(pathlib.Path(__file__).parent)
+            parent_folder = str(pathlib.Path(current_file_folder).parent)
+
+            file_utils.rename_single_excel(parent_folder)
             
         topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"))
         time.sleep(0.5)

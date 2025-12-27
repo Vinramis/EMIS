@@ -140,10 +140,13 @@ def rename_single_excel(path: str, new_name="КТП.xlsx"):
     """
     Renames the single .xlsx file in the current directory to the specified name.
     """
+    print(path)
     path = noramlize_path(path)
+    print(path)
 
     # 1. Get list of all files in the current directory
     files = os.listdir(path)
+    print(files)
     
     # 2. Filter for .xlsx files (ignoring temporary ~$ files created by Excel)
     excel_files = [f for f in files if f.endswith('.xlsx') and not f.startswith('~$')]
