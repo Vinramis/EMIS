@@ -15,7 +15,7 @@ except Exception as e:
 
 def run_automation():
     # 1. Загрузка конфигурации
-    cfg = JsonTwin('config.json')
+    cfg = JsonTwin("config.json")
     autorisation = cfg.get("credentials")
     settings = cfg.get("settings")
 
@@ -25,8 +25,8 @@ def run_automation():
     # 2. Определение наибольшего интервала
     classwork_interval: tuple[int, int] = file_utils.get_numerical_interval(settings.get("classwork_folder"))
     homework_interval: tuple[int, int] = file_utils.get_numerical_interval(settings.get("homework_folder"))
-    cfg.set("settings", "start_from_line", min(classwork_interval[0], homework_interval[0]))
-    cfg.set("settings", "end_on_line", max(classwork_interval[1], homework_interval[1]))
+    settings["start_from_line"] = min(classwork_interval[0], homework_interval[0])
+    settings["end_on_line"] = max(classwork_interval[1], homework_interval[1])
 
     # 3. Автоматизация браузера
     with sync_playwright() as p:
@@ -57,17 +57,14 @@ def run_automation():
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
-        print(settings.get("topics_file_path"))
-        print(pathlib.Path(settings.get("topics_file_path")).is_file())
-        if not pathlib.Path(settings.get("topics_file_path")).is_file():
-            current_file_folder = str(pathlib.Path(__file__).parent)
-            parent_folder = str(pathlib.Path(current_file_folder).parent)
+        if not pathlib.Path(file_utils.normalize_path(settings.get("topics_file_path"))).is_file():
+            base_directory = pathlib.Path(__file__).parent
+            parent_directory = pathlib.Path(base_directory).parent
 
-            file_utils.rename_single_excel(parent_folder)
+            file_utils.rename_single_excel(parent_directory)
             cfg.set("settings", "topics_file_path", "..\\КТП.xlsx")
-        else:
-            print("Excel файл найден!")
-        topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"))
+
+        topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"), settings.get("start_from_line"), settings.get("end_on_line"))
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
         time.sleep(0.5)

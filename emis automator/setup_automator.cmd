@@ -7,7 +7,7 @@ if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 :: Define python path
 set "PYTHON="components\python314\python""
 :: Set title
-TITLE Автоматизатор EMIS v0.7
+TITLE Автоматизатор EMIS v0.9
 :: Welcome user
 echo.
 echo.

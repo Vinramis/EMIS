@@ -1,96 +1,143 @@
 import pathlib
-from file_utils import noramlize_path
+from typing import Union, Dict, Any
+from file_utils import normalize_path
 
 import json
 import openpyxl
 import sqlite3
 
+
 class JsonTwin:
-    def __init__(self, twin: dict | list | str = None):
-        # 1. Initialize core attributes
-        self._configuration = None
-        self.twin_path = None
+    def __init__(self, source: Union[str, pathlib.Path, Dict, 'JsonTwin'] = None, root: 'JsonTwin' = None):
+        self._data: Dict = {}
+        self._root = root
+        self.file_path = None
+        self.base_directory = pathlib.Path(__file__).parent
 
-        if isinstance(twin, (str, pathlib.Path)):
-            # Handle File Paths
-            # base_path = pathlib.Path(__file__).parent.resolve()
-            # self.twin_path = base_path / twin
-            self.twin_path = noramlize_path(twin)
-            self._load_from_file()
-        elif isinstance(twin, (dict, list)):
-            # Handle Raw Data
-            self._configuration = twin
-        elif twin is None:
-            self._configuration = {}
+        if isinstance(source, JsonTwin):
+            self._data = source._data
+            self._root = source
+        elif isinstance(source, (str, pathlib.Path)):
+            self.file_path = normalize_path(source)
+            self._load_or_create()
+        elif isinstance(source, dict):
+            self._data = source
 
-    def _load_from_file(self):
+    def _load_or_create(self):
+        """Try to load the file; if missing or corrupt, initialize a new one."""
         try:
-            if self.twin_path and pathlib.Path(self.twin_path).exists():
-                with open(self.twin_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    # Ensure we are storing the raw dict/list, not a string
-                    self._configuration = data if data is not None else {}
-            else:
-                self.create_twin_file()
-        except (json.JSONDecodeError, FileNotFoundError):
-            self.create_twin_file()
+            with open(self.file_path, "r", encoding="utf-8") as f:
+                self._data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self._save()
 
-    def get(self, key=None):
+    def _save(self):
+        """Sync to disk if a file path is configured."""
+        if self._root:
+            self._root._save()
+        elif self.file_path:
+            # Ensure folder exists before writing
+            self.file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.file_path, "w", encoding="utf-8") as f:
+                print("before")
+                json.dump(self._data, f, ensure_ascii=False, indent=4)
+                print("after")
+
+    def _concatenate(entries: list) -> dict: # entries=["a", "b", "c", "d", "e"]
+        """Makes a nested dictionary from given entries."""
+        result = {}
+        for i in range(len(entries)):
+            result = {entries[i]: result}
+        return result
+
+    def get(self, key: str = None) -> Any:
         """
-        Safely retrieves a value. If the value is a dict/list, 
-        returns a new JsonTwin instance for chaining.
+        Retrieves a value. Returns a new JsonTwin for dicts/lists
+        to allow chaining (e.g., twin.get('a').get('b')).
         """
         if key is None:
-            return self._configuration
-        
-        # Ensure we are acting on a dictionary before subscripting
-        if not isinstance(self._configuration, dict):
-            print(self._configuration)
-            return None
-            
-        value = self._configuration.get(key)
-        
-        if isinstance(value, (dict, list)):
-            return JsonTwin(value)
-        return value
+            return self._data
 
-    def set(self, section, key, value) -> None:
-        if not isinstance(self._configuration, dict):
-            self._configuration = {}
-            
-        if section not in self._configuration:
-            self._configuration[section] = {}
-            
-        self._configuration[section][key] = value
-        
-        # Only sync if this instance is the root (has a file path)
-        if self.twin_path:
-            self.sync()
+        # safely get value, default to None if _data is not a dict
+        val = self._data[key] if isinstance(self._data, dict) else None
 
-    def create_twin_file(self):
-        self._configuration = {}
-        if self.twin_path:
-            self.twin_path.parent.mkdir(parents=True, exist_ok=True)
-            self.sync()
+        if isinstance(val, (dict, list)):
+            return JsonTwin(val)
+        return val
 
-    def sync(self) -> None:
-        if self.twin_path:
-            with open(self.twin_path, "w", encoding="utf-8") as f:
-                json.dump(self._configuration, f, ensure_ascii=False, indent=4)
+    def super_get(self, key: str) -> Any:
+        """
+        Retrieves a value. Returns a new JsonTwin for dicts.
+        """
+        if key in self._data.keys():
+            return self.get(key)
+        for k in self._data.keys():
+            if isinstance(self.get(k), JsonTwin):
+                return self.get(k).super_get(key)
+        return None
 
-    def __call__(self, key):
+    def set(self, key: str, value: Any) -> None:
+        """Sets a value."""
+        # setdefault creates the section dict if it doesn't exist
+        # if isinstance(value, dict):
+        #     self._data.setdefault(key, {})
+        # else:
+        #     self._data.setdefault(key, "")
+        self._data[key] = value
+        self._save()
+
+    # def super_set(self, keys: list[str], value: Any, entry_autofind: bool = False, current_strike: int = 0, best_strike: int = 0) -> None:
+    #     """Sets a value. Creates path if it doesn't exist."""
+
+    #     # if best_strike < current_strike:
+    #     #     best_strike = current_strike
+    #     # if entry_autofind:
+    #     #     entry = self.super_get(keys[0])
+
+    #     if len(keys) == 1:
+    #         self.set(keys[0], value)
+    #         return
+    #     self.set(keys[0], {keys[1]: ""}) 
+    #     self.super_set(keys[1:], value)
+
+    def __getitem__(self, key):
+        """Allows using twin['key'] syntax."""
         return self.get(key)
 
+    def __call__(self, key):
+        """Allows using twin('key') syntax."""
+        return self.get(key)
+
+    def __setitem__(self, key, value):
+        """Allows using twin['key'] = value syntax."""
+        self.set(key, value)
+
+    def to_string(self, beautiful: bool = True, indent: int = 4):
+        """Returns a string representation of the JsonTwin."""
+        return json.dumps(self._data, indent=indent) if beautiful else str(self._data)
+
+    def to_beautiful_string(self, indent: int = 4):
+        """Returns a string representation of the JsonTwin in a beautiful format."""
+        return self.to_string(True, indent)
+
     def __str__(self):
-        return str(self._configuration)
+        """Allows using print(twin) syntax."""
+        return self.to_string()
+
+    def __dict__(self):
+        """Allows using dict(twin) syntax."""
+        return self._data
+
 
 class ExcelTableTwin:
     def __init__(self, twin):
         pass
 
+
 class DataBaseTwin:
     def __init__(self, twin):
         pass
+
 
 if __name__ == "__main__":
     # Test

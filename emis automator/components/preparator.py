@@ -18,14 +18,8 @@ import playwright
 
 import file_utils
 import excel_utils
-from config_manager import ConfigManager
+from config_manager import JsonTwin
 
-# Check if config.json exists and is valid
-try:
-    configuration = ConfigManager()
-except Exception as e:
-    print(f"[ОШИБКА] Не удалось загрузить конфигурацию: {e}")
-    print("(?) Кажется, вы запустили программу неправильно. Попробуйте заново.")
-    pause = input("Нажмите Enter, чтобы выйти...")
-    sys.exit(1)
-
+# Load config
+configuration = JsonTwin("config.json")
+if configuration.get() == {}: return
