@@ -8,14 +8,10 @@ async def main():
         page = await context.new_page()
 
         # 1. Create the bridge between JS and Python
-        async def log_click_binding(source, details):
+        async def log_click_binding(source: dict, details: dict):
             # This runs in Python whenever a click happens in the browser
             print("--- CLICK DETECTED ---")
-            print(f"Selector:    {details['selector']}")
-            if details['placeholder']:
-                print(f"Placeholder: {details['placeholder']}")
-            if details['text']:
-                print(f"Text:        {details['text']}")
+            print(details)
             print(f"URL:         {source['page'].url}\n")
 
         await page.expose_binding("pythonLogClick", log_click_binding)

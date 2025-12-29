@@ -86,7 +86,7 @@ class JsonTwin:
 
 class ExcelTableTwin:
     def __init__(self, twin):
-        pass 
+        pass
 
 class DataBaseTwin:
     def __init__(self, twin):

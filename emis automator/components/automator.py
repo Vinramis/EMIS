@@ -15,7 +15,6 @@ except Exception as e:
 
 def run_automation():
     # 1. Загрузка конфигурации
-    global cfg
     cfg = JsonTwin('config.json')
     autorisation = cfg.get("credentials")
     settings = cfg.get("settings")
@@ -31,7 +30,7 @@ def run_automation():
 
     # 3. Автоматизация браузера
     with sync_playwright() as p:
-        browser = p.webkit.launch(headless=False)
+        browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         time.sleep(0.2)
 
@@ -58,12 +57,16 @@ def run_automation():
 
         # 4. Подготовка данных
         print("Подготовка данных из Excel...")
+        print(settings.get("topics_file_path"))
+        print(pathlib.Path(settings.get("topics_file_path")).is_file())
         if not pathlib.Path(settings.get("topics_file_path")).is_file():
             current_file_folder = str(pathlib.Path(__file__).parent)
             parent_folder = str(pathlib.Path(current_file_folder).parent)
 
             file_utils.rename_single_excel(parent_folder)
-            
+            cfg.set("settings", "topics_file_path", "..\\КТП.xlsx")
+        else:
+            print("Excel файл найден!")
         topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"))
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
