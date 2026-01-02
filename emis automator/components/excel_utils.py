@@ -7,7 +7,7 @@ from openpyxl.utils.cell import (
 from file_utils import normalize_path
 
 
-def get_cell_value(sheet, cell_ref: str):
+def get_cell_value(sheet: openpyxl.Worksheet, cell_ref: str):
     """
     Gets cell value from Worksheet by reference (e.g., 'A1').
     """
@@ -18,7 +18,7 @@ def get_cell_value(sheet, cell_ref: str):
 
 
 def generate_sequence(
-    sheet, start_cell: str, mode: str, max_empty_cells_in_a_row: int = 5
+    sheet: openpyxl.Worksheet, start_cell: str, mode: str, max_empty_cells_in_a_row: int = 5
 ) -> list[str]:
     """
     Generates a sequence of non-empty cell references from Worksheet.
@@ -63,34 +63,23 @@ def generate_sequence(
 
 
 def read_topics_from_excel(
-    file_path: str,
-    start_cell: str,
-    mode: str,
+    sheet: openpyxl.Worksheet,
+    start_cell: str = "B6",
+    mode: str = "col",
     starting_topic_number: int = 1,
     ending_topic_number: int = None,
 ) -> list[str]:
     """
     Helper to read topics from the excel file.
     """
-    try:
-        file_path = normalize_path(file_path)
+    cell_sequence = generate_sequence(sheet, start_cell, mode)
 
-        # Load workbook and select active sheet
-        wb = openpyxl.load_workbook(file_path, data_only=True)
-        sheet = wb.active
+    values = []
+    for cell_ref in cell_sequence:
+        val = get_cell_value(sheet, cell_ref)
+        if val is not None:
+            values.append(str(val).strip())
 
-        cell_sequence = generate_sequence(sheet, start_cell, mode)
-
-        values = []
-        for cell_ref in cell_sequence:
-            val = get_cell_value(sheet, cell_ref)
-            if val is not None:
-                values.append(str(val).strip())
-
-        if ending_topic_number:
-            values = values[starting_topic_number - 1 : ending_topic_number]
-        return values
-
-    except Exception as e:
-        print(f"[ОШИБКА] Чтение файла Excel: {e}")
-        return []
+    if ending_topic_number:
+        values = values[starting_topic_number - 1 : ending_topic_number]
+    return values

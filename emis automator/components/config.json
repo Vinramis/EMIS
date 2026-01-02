@@ -1,0 +1,9 @@
+{
+    "topics_file_path": "..\\КТП.xlsx",
+    "classwork_folder": "..\\КЛ",
+    "homework_folder": "..\\ДЗ",
+    "start_cell": "B6",
+    "start_from_line": -1,
+    "end_on_line": -1,
+    "mode": "col"
+}

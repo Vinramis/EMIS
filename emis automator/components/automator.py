@@ -3,6 +3,7 @@ import sys
 import pathlib
 
 try:
+    import openpyxl
     from playwright.sync_api import sync_playwright
     from config_manager import JsonTwin
     import file_utils
@@ -13,11 +14,11 @@ except Exception as e:
     pause = input("Нажмите Enter...")
     sys.exit(1)
 
-def run_automation():
+def run_automation(silent: bool = False):
     # 1. Загрузка конфигурации
-    cfg = JsonTwin("config.json")
-    autorisation = cfg.get("credentials")
-    settings = cfg.get("settings")
+    cfg: JsonTwin = JsonTwin("config.json")
+    autorisation: JsonTwin = cfg.get("credentials")
+    settings: JsonTwin = cfg.get("settings")
 
     selectors = JsonTwin("web.json").get("constants")
 
@@ -30,8 +31,14 @@ def run_automation():
 
     # 3. Автоматизация браузера
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=silent)
+        try:
+            browser = browser.new_context(storage_state="access.json")
+        except Exception:
+            print("[ОШИБКА] Не удалось загрузить данные авторизации.")
+
         page = browser.new_page()
+
         time.sleep(0.2)
 
         print("Переход на страницу входа...")
@@ -40,19 +47,19 @@ def run_automation():
 
         # Вход
         print("Выполняется вход...")
+        page.locator(selectors("One_ID_button_selector")).click()
+        time.sleep(0.1)
+        page.get_by_placeholder(selectors("login_field_placeholder")).fill(autorisation("login"))
+        page.get_by_placeholder(selectors("password_field_placeholder")).fill(autorisation("password"))
+        time.sleep(0.1)
+        page.get_by_text(selectors("login_button_text")).first.click()
         try:
-            page.locator(selectors("One_ID_button_selector")).click()
-            time.sleep(0.1)
-            page.get_by_placeholder(selectors("login_field_placeholder")).fill(autorisation("login"))
-            page.get_by_placeholder(selectors("password_field_placeholder")).fill(autorisation("password"))
-            time.sleep(0.1)
-            page.get_by_text(selectors("login_button_text")).first.click()
             page.wait_for_url(selectors("success_url"))
             print("Вход выполнен успешно!")
+            page.context.storage_state(path="access.json")
         except Exception as e:
             print(f"[ОШИБКА] Вход не удался: {e}")
-            cfg.set("credentials", "validity", -1)
-            cfg.sync()
+            autorisation["validity"] = -1
             return
 
         # 4. Подготовка данных
@@ -62,9 +69,9 @@ def run_automation():
             parent_directory = pathlib.Path(base_directory).parent
 
             file_utils.rename_single_excel(parent_directory)
-            cfg.set("settings", "topics_file_path", "..\\КТП.xlsx")
 
-        topic_names = excel_utils.read_topics_from_excel(settings.get("topics_file_path"), settings.get("start_cell"), settings.get("mode"), settings.get("start_from_line"), settings.get("end_on_line"))
+        sheet = openpyxl.load_workbook(settings.get("topics_file_path")).active
+        topic_names = excel_utils.read_topics_from_excel(sheet, settings.get("start_cell"), settings.get("mode"), settings.get("start_from_line"), settings.get("end_on_line"))
         time.sleep(0.5)
         print(f"Извлечено {len(topic_names)} записей из Excel.")
         time.sleep(0.5)

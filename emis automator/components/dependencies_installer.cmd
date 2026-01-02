@@ -29,27 +29,29 @@ set "PYTHON="python314\python""
 set "PIP="python314\Scripts\pip""
 
 echo.
-echo [ИНФО] Обновляем компоненты (всего 3)...
+
+echo [ИНФО] Обновляем компоненты...
 echo (?) Можете закрыть это окно, если обновление занимает слишком много времени
+
 echo.
 
 echo (?) Библиотека Playwright нужна для работы с веб-браузером
-!PIP! install playwright --no-warn-script-location >nul
-TIMEOUT /T 1 >nul
+!PYTHON! -m pip install playwright --no-warn-script-location >nul
+timeout /T 1 >nul
 echo Библиотека Playwright обновлена. 
 
 echo.
 
 echo (?) Библиотека OpenPyXL нужна для работы с Excel
-!PIP! install openpyxl --no-warn-script-location >nul
-TIMEOUT /T 1 >nul
+!PYTHON! -m pip install openpyxl --no-warn-script-location >nul
+timeout /T 1 >nul
 echo Библиотека OpenPyXL обновлена.
 
 echo.
 
 echo (?) WebKit - это браузер, который будет использоваться для автоматизации
 !PYTHON! -m playwright install webkit >nul
-TIMEOUT /T 1 >nul
+timeout /T 1 >nul
 echo WebKit обновлен.
 
 echo.
@@ -59,5 +61,5 @@ echo.
 echo (?) Обновление завершено!
 echo [ИНФО] Закрываем окно...
 echo.
-TIMEOUT /T 3 >nul
+pause >nul
 exit
