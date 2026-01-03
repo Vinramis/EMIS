@@ -13,24 +13,24 @@
         "homework_file_postfix": "_homework_file",
         "add_line_button": ".Full"
     },
-    "urls": {
-        "one_id_login": "https://litsey.edu.uz/login",
-        "success": "https://litsey.edu.uz",
-        "new_topic": "https://litsey.edu.uz/teacher/topics/add"
+    "login": {
+        "One_ID_login_url": "https://litsey.edu.uz/login",
+        "One_ID_button_selector": "#root > div > div > div > main > div > div > a",
+        "login_button_text": "Kirish",
+        "success_url": "https://litsey.edu.uz/"
     },
-    "selectors": {
-        "one_id_button": "#root > div > div > div > main > div > div > a"
-    },
-    "placeholders": {
-        "login_field": "Loginni kiriting",
-        "password_field": "Parolni kiriting",
-        "login_button": "Kirish"
-    },
-    "topics_lego": {
-        "topics_prefix": "#topics_",
+    "syllabus": {
+        "new_topic_url": "https://litsey.edu.uz/teacher/topics/add",
+        "prefix": "#topics_",
         "topic_name_postfix": "_name",
         "topic_file_postfix": "_topic_file",
         "homework_file_postfix": "_homework_file",
         "add_line_button": ".Full"
+    },
+    "topics": {
+        "groups_url": "https://litsey.edu.uz/teacher/groups",
+        "field_selector_prefix": "#StudyGuide_data_",
+        "field_selector_postfix": "_topic_id",
+        "virtual_list_selector": "div.ant-select-item-option-content"
     }
 }
