@@ -1,5 +1,6 @@
 import os
 import time
+from data_utils import numbers_in_string
 
 
 def extract_files(folder_path: str, case_insensitivity: bool, infix: list[str] | str):
@@ -50,19 +51,6 @@ def find_file_by_prefix(directory: str, prefix: str):
         print(f"[ОШИБКА] Ошибка при поиске в директории '{directory}': {e}")
         return None
     return None
-
-
-def numbers_in_string(string: str) -> list[int]:
-    numbers_found = []
-    number_buffer = ""
-    for char in string:
-        if char.isdigit():
-            number_buffer += char
-        else:
-            if number_buffer:
-                numbers_found.append(int(number_buffer))
-                number_buffer = ""
-    return numbers_found
 
 
 def find_file_by_count(directory: str, count: int) -> str | None:
@@ -165,7 +153,7 @@ def get_files(
     """
     directory = normalize_path(directory)
     found_items = os.listdir(directory)
-    return [file for file in found_items if os.path.isfile(os.path.join(directory, file))]
+    return [file for file in found_items if os.path.isfile(file)]
 
 
 def rename_single_excel(path, new_name="КТП.xlsx"):

@@ -1,6 +1,19 @@
 from typing import Union
 
 
+def numbers_in_string(string: str) -> list[int]:
+    numbers_found = []
+    number_buffer = ""
+    for char in string:
+        if char.isdigit():
+            number_buffer += char
+        else:
+            if number_buffer:
+                numbers_found.append(int(number_buffer))
+                number_buffer = ""
+    return numbers_found
+
+
 def compare_two_trigrams(
     trigram1: str,
     trigram2: str,
@@ -36,13 +49,13 @@ def compare_trigrams(
 
     for i, j in zip(range(len(trigrams1)), range(len(trigrams2))):
         result.append(
-                compare_two_trigrams(
-                    trigrams1[i],
-                    trigrams2[j],
-                    case_sensitive=case_sensitive,
-                    developer_mode=developer_mode,
-                )
+            compare_two_trigrams(
+                trigrams1[i],
+                trigrams2[j],
+                case_sensitive=case_sensitive,
+                developer_mode=developer_mode,
             )
+        )
 
     if not developer_mode:
         result = all(result)
@@ -81,7 +94,7 @@ def compare_two_words(
         weak_threshold = threshold * (1 - 1 / len(smaller_one))
 
         difference = len(bigger_one) - len(smaller_one)
-        if difference/len(smaller_one) > 0.2:
+        if difference / len(smaller_one) > 0.2:
             return False
         results = []
 
@@ -100,7 +113,7 @@ def compare_two_words(
             )
         found_matching_trigrams = [i[0] for i in results]
         found_total_trigrams = [i[1] for i in results]
-        
+
         matching_trigrams = max(found_matching_trigrams)
         total_trigrams = max(found_total_trigrams)
 
