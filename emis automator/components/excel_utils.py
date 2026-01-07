@@ -4,7 +4,7 @@ from openpyxl.utils.cell import (
     column_index_from_string,
     get_column_letter,
 )
-from file_utils import normalize_path
+# from file_utils import normalize_path
 
 
 def get_cell_value(sheet: openpyxl.Worksheet, cell_ref: str):
@@ -18,11 +18,16 @@ def get_cell_value(sheet: openpyxl.Worksheet, cell_ref: str):
 
 
 def generate_sequence(
-    sheet: openpyxl.Worksheet, start_cell: str, mode: str, max_empty_cells_in_a_row: int = 5
+    sheet: openpyxl.Worksheet | openpyxl._WorksheetOrChartsheetLike,
+    start_cell: str,
+    mode: str,
+    max_empty_cells_in_a_row: int = 5,
 ) -> list[str]:
     """
     Generates a sequence of non-empty cell references from Worksheet.
     """
+    if isinstance(sheet, openpyxl.Workbook):
+        sheet = sheet.active
     sequence = []
     empty_cells_in_a_row = 0
 
@@ -64,6 +69,7 @@ def generate_sequence(
 
 def read_topics_from_excel(
     sheet: openpyxl.Worksheet,
+    *,
     start_cell: str = "B6",
     mode: str = "col",
     starting_topic_number: int = 1,

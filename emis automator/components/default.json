@@ -1,10 +1,12 @@
 {
     "config.json": {
         "topics_file_path": "..\\КТП.xlsx",
-        "classwork_folder": "..\\КЛ",
-        "homework_folder": "..\\ДЗ",
         "start_cell": "B6",
-        "mode": "col"
+        "mode": "col",
+        "start_topic": 0,
+        "end_topic": 0,
+        "classwork_folder": "..\\КЛ",
+        "homework_folder": "..\\ДЗ"
     },
     "credentials.json": {
         "login": "",
@@ -13,7 +15,7 @@
     },
     "input_data.json": {
         "0": {
-            "topic_number": -1,
+            "topic_number": 0,
             "topic_name": "",
             "classwork_file_path": "",
             "homework_file_path": ""

@@ -145,9 +145,7 @@ def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
     return topics_folder, homework_folder
 
 
-def get_files(
-    directory: str
-) -> list[str]:
+def get_files(directory: str) -> list[str]:
     """
     Returns the list of files in the directory.
     """
@@ -156,36 +154,45 @@ def get_files(
     return [file for file in found_items if os.path.isfile(file)]
 
 
-def rename_single_excel(path, new_name="КТП.xlsx"):
+def get_by_extension(directory: str, extension: str) -> list[str]:
+    """
+    Returns the list of files in the directory with the specified extension.
+    """
+    found_items = get_files(directory)
+    return [file for file in found_items if file.endswith(extension)]
+
+
+def find_single_excel(directory: str) -> str:
+    """
+    Returns the path to the single .xlsx file in the directory.
+    """
+    excel_files = get_by_extension(directory, ".xlsx")
+    if len(excel_files) == 1:
+        return excel_files[0]
+    return None
+
+
+def rename_single_excel(directory: str = "", new_name="КТП.xlsx"):
     """
     Renames the single .xlsx file in the current directory to the specified name.
     """
-    path = normalize_path(path)
-
     # 1. Get list of all files in the current directory
-    files = os.listdir(path)
+    excel_file = find_single_excel(directory)
 
-    # 2. Filter for .xlsx files (ignoring temporary ~$ files created by Excel)
-    excel_files = [f for f in files if f.endswith(".xlsx") and not f.startswith("~$")]
-
-    # 3. Check if exactly one file exists
-    if len(excel_files) == 1:
-        old_name = excel_files[0]
+    # 2. Check if exactly one file exists
+    if excel_file:
+        print("[ИНФО] Файл КТП найден!")
+        old_name = excel_file
 
         # Avoid renaming if it's already named correctly
         if old_name == new_name:
             return
         try:
             os.rename(old_name, new_name)
-            print("[ИНФО] Файл КТП найден!")
         except Exception as e:
             print(f"[ОШИБКА] Что-то пошло не так при поиске файла КТП: {e}")
-    elif len(excel_files) == 0:
-        print("[ОШИБКА] Файл КТП не найден")
     else:
-        print(
-            "[ОШИБКА] Найдено несколько файлов КТП. Пожалуйста, оставьте только один файл"
-        )
+        print("[ОШИБКА] Файл КТП не найден или несколько файлов найдено")
 
 
 def get_numerical_interval(directory: str) -> tuple[int, int]:
@@ -225,10 +232,14 @@ def normalize_path(path) -> str:
     Handles paths starting with "..".
     """
     path = str(path)
-    desirable_file_folder = os.path.dirname(__file__)  # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\emis automator\components
+    desirable_file_folder = os.path.dirname(
+        __file__
+    )  # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\emis automator\components
     if path.startswith(".."):
         path = path[3:]  # ..\\КЛ
-        desirable_file_folder = os.path.dirname(desirable_file_folder)  # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit=
+        desirable_file_folder = os.path.dirname(
+            desirable_file_folder
+        )  # C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit=
     elif path.startswith(".") or path.startswith("\\"):
         path = path[2:]  # \КЛ
     path = os.path.join(desirable_file_folder, path)

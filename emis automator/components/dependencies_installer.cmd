@@ -5,28 +5,7 @@ setlocal enabledelayedexpansion
 :: Title
 TITLE Менеджер зависимостей
 
-
-
-:: Doesn't work as intended
-@REM :: Check for internet connection
-@REM :CHECK_CONNECTION
-@REM ping 8.8.8.8 -n 1 | find "TTL=" >nul
-@REM if errorlevel 0 (
-@REM     goto :INSTALL_DEPS
-@REM ) else (
-@REM     goto :ERROR_MESSAGE
-@REM )
-
-@REM :ERROR_MESSAGE
-@REM echo [ОШИБКА] Нет подключения к интернету. 
-@REM echo (?) Пожалуйста, проверьте подключение и нажмите Enter
-@REM pause >nul
-@REM goto :CHECK_CONNECTION
-
-
-
 :: Set location to python, then of this file
-
 set "PYTHON="python314\python""
 chdir /d %~dp0
 

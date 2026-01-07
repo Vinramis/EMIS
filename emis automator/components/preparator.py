@@ -1,18 +1,18 @@
 import time
 import os
 import sys
-import json
-import pathlib
 from pathlib import Path
 
 import openpyxl
 from playwright.sync_api import sync_playwright, Browser, Page
 
+import excel_utils
+import file_utils
 from file_utils import normalize_path
-from excel_utils import *
+
+# from excel_utils import extract_topics
 from data_utils import numbers_in_string
 from config_manager import JsonTwin
-# from automator import run_automation
 
 # This script is used to prepare everything for smooth work of the main script.
 
@@ -21,6 +21,19 @@ from config_manager import JsonTwin
 # 2. Checks topics numbers interval.
 # 3. Creates/Rewrites a config.db file. (containing all topic names and file paths)
 # 4.
+
+
+os.chdir(os.path.dirname(sys.argv[0]))
+
+
+# Testing
+test_mode = False
+
+
+def test():
+    configure_input_data(
+        config_json=JsonTwin("config.json"), input_data_json=JsonTwin("input_data.json")
+    )
 
 
 def main():
@@ -33,22 +46,36 @@ def main():
     input_data_json: JsonTwin = JsonTwin("input_data.json")
     web_json: JsonTwin = JsonTwin("web.json")
 
-    # Ensure config.json is valid
-    ensure_json_validity(config_json, default_json("config.json"))
+    headless = True
+    if "--not-headless" in sys.argv:
+        headless = False
 
-    # Ensure login
-    ensure_login(
-        cookies_json=cookies_json,
-        credentials_json=credentials_json,
-        web_json=web_json,
-        headless=True,
-    )
+    if len(sys.argv) > 1:
+        if "--login" in sys.argv:
+            ensure_login(headless=headless)
+    else:
+        # Ensure config.json is valid
+        ensure_json_validity(config_json, default_json("config.json"))
 
-    # # Ensure input_data.json is valid
-    # ensure_json_validity(input_data_json, default_json, "input_data.json")
+        # Configure input_data.json
+        configure_input_data(
+            config_json=config_json,
+            input_data_json=input_data_json,
+        )
 
-    # # Ensure web.json is valid
-    # ensure_json_validity(web_json, default_json, "web.json")
+        # Ensure login
+        ensure_login(
+            cookies_json=cookies_json,
+            credentials_json=credentials_json,
+            web_json=web_json,
+            headless=headless,
+        )
+
+        # # Ensure input_data.json is valid
+        # ensure_json_validity(input_data_json, default_json, "input_data.json")
+
+        # # Ensure web.json is valid
+        # ensure_json_validity(web_json, default_json, "web.json")
 
 
 def ask_credentials() -> tuple[str, str]:
@@ -60,21 +87,78 @@ def ask_credentials() -> tuple[str, str]:
 def ask_topics_interval() -> tuple[int, int]:
     start_topic: int = numbers_in_string(input("Введите номер первой темы: "))[0]
     end_topic: int = numbers_in_string(input("Введите номер последней темы: "))[0]
+    print(f"Выбраны темы от {start_topic} до {end_topic}.")
     return start_topic, end_topic
 
 
-def configure_input_data(config_json: JsonTwin = JsonTwin("config.json"), input_data_json: JsonTwin = JsonTwin("input_data.json")) -> None:
+def configure_input_data(
+    config_json: JsonTwin = JsonTwin("config.json"),
+    input_data_json: JsonTwin = JsonTwin("input_data.json"),
+) -> None:
     """
-    Configures input_data.json, using config.json as a reference.
-    If 
+    Configures input_data_json, using config_json as a reference.
     """
     topics_file_path: str = normalize_path(config_json("topics_file_path"))
-    topics = openpyxl.load_workbook(filename=topics_file_path, data_only=True).active
-    print(type(topics))
+    start_cell: str = config_json("start_cell")
+    mode: str = config_json("mode")
+    classwork_folder: str = config_json("classwork_folder")
+    homework_folder: str = config_json("homework_folder")
+
+    classwork_interval: tuple[int, int] = file_utils.get_numerical_interval(
+        classwork_folder
+    )
+    homework_interval: tuple[int, int] = file_utils.get_numerical_interval(
+        homework_folder
+    )
+    start_from_line: int = min(classwork_interval[0], homework_interval[0])
+    end_on_line: int = max(classwork_interval[1], homework_interval[1])
+    print(f"Выбраны темы от {start_from_line} до {end_on_line}.")
+
+    config_json["start_from_line"] = start_from_line
+    config_json["end_on_line"] = end_on_line
+
+    # Try to get topics from topics_file_path
+    try:
+        topics_sheet = openpyxl.load_workbook(
+            filename=topics_file_path, data_only=True
+        ).active
+    except Exception:
+        base_directory = Path(__file__).parent
+        parent_directory = Path(base_directory).parent
+
+        topics_file_path = file_utils.find_single_excel(parent_directory)
+        if topics_file_path:
+            config_json["topics_file_path"] = topics_file_path
+        else:
+            print(
+                f"Файл КТП не найден или не является единственным Excel файлом в {parent_directory}"
+            )
+
+    topics = excel_utils.read_topics_from_excel(
+        topics_sheet,
+        start_cell=start_cell,
+        mode=mode,
+        starting_topic_number=start_from_line,
+        ending_topic_number=end_on_line,
+    )
+
+    counter = 0
+    for i in range(start_from_line, end_on_line + 1):
+        input_data_json[counter] = {
+            "topic_number": i,
+            "topic_name": topics[counter],
+            "classwork_file_path": file_utils.find_file_by_count(
+                config_json.get("classwork_folder"), i
+            ),
+            "homework_file_path": file_utils.find_file_by_count(
+                config_json.get("homework_folder"), i
+            ),
+        }
+        counter += 1
 
 
 def ensure_json_validity(target_json: JsonTwin, its_default: JsonTwin) -> bool:
-    #     Check for it's existance and for entries. If it doesn't exist it will not pass the difference check.
+    """Check for it's existance and for entries. If it doesn't exist it will not pass the difference check."""
     if target_json.super_keys().difference(its_default.super_keys()):
         target_json.pull(its_default)
         return False
@@ -100,8 +184,9 @@ def get_cookies(
         page.wait_for_load_state("networkidle")
 
         if page.url != c("success_url"):
-            
-            raise Exception("Не получилось войти. ")
+
+            print("Не получилось войти.")
+            return None
         cookies = page.context.storage_state()
         browser.close()
         return dict(cookies)
@@ -113,10 +198,10 @@ def extract_expires(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> int:
 
 
 def hard_extract(
-    cookies_json: JsonTwin = JsonTwin("cookies.json"), key: str = "expires"
+    target_json: JsonTwin = JsonTwin("cookies.json"), key: str = "expires"
 ) -> str:
-    """Extracts expires from cookies.json"""
-    data = cookies_json.to_string(beautiful=False)
+    """Extracts literal value from a JsonTwin"""
+    data = target_json.to_string(beautiful=False)
     value_chunk = data.split(key)[1].split(",")[0]
     value = value_chunk[2:].strip()
     return value
@@ -157,15 +242,14 @@ def ensure_login(
         if cookie_practice_check(
             cookies_json.file_path, web_json("login"), headless=headless
         ):
-            # print("Cookies are valid")
             return
-        # else:
-        #     if not cookies_expired(cookies_json):
-        # print("Cookies are not expired, but are invalid")
     else:
         os.remove(cookies_json.file_path)
-        # print("Cookies are invalid")
         if credentials_json("validity") == -1:
+            print(f"[ИНФО] При предыдущем входе произошла ошибка. Введите ваши учетные данные заново. Предыдущие данные: {credentials_json('login')},{credentials_json('password')}")
+            credentials_json["login"], credentials_json["password"] = ask_credentials()
+            credentials_json.set("validity", 0)
+        elif credentials_json("validity") != 1:
             credentials_json["login"], credentials_json["password"] = ask_credentials()
             credentials_json.set("validity", 0)
         cookies = get_cookies(
@@ -180,6 +264,7 @@ def ensure_login(
     ):
         credentials_json.set("validity", 1)
     else:
+        credentials_json.set("validity", -1)
         if looping > 0:
             ensure_login(
                 cookies_json=cookies_json,
@@ -188,8 +273,7 @@ def ensure_login(
                 headless=headless,
                 looping=looping - 1,
             )
-        credentials_json.set("validity", -1)
 
 
 if __name__ == "__main__":
-    main()
+    test() if test_mode else main()

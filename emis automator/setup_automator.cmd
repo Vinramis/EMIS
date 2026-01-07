@@ -8,7 +8,7 @@ if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
 :: Set title
-title Автоматизатор EMIS v2.1
+title Автоматизатор EMIS v2.5
 :: Welcome user
 echo.
 echo.
@@ -19,20 +19,19 @@ echo.
 echo.
 
 :: Sequence
-echo Проверка подключения...
-echo.
-!PYTHON! components/connection_check.py
+echo Проверяем подключение...
+!PYTHON! components/connection_check.py internet
 
 echo.
 
-echo Подготовка компонентов...
-echo.
+echo Подготавливаем компоненты...
 !PLAYWRIGHT! install
 
 echo.
 
-echo Подготовка данных...
-echo.
+echo Входим в EMIS...
+!PYTHON! components/preparator.py --login
+!PYTHON! components/connection_check.py all cookies.json
 !PYTHON! components/preparator.py
 
 echo.
@@ -59,7 +58,7 @@ if !mode! == 1 (
 echo.
 echo.
 echo Кажется, браузер закрыт. Нажмите Enter для выхода...
-echo (?) Или можно просто закрыть это окно
+echo (?) Можно просто закрыть это окно
 echo.
 echo.
 echo.
