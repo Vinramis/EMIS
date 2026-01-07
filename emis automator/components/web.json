@@ -13,10 +13,13 @@
         "homework_file_postfix": "_homework_file",
         "add_line_button": ".Full"
     },
+    
     "login": {
         "One_ID_login_url": "https://litsey.edu.uz/login",
-        "One_ID_button_selector": "#root > div > div > div > main > div > div > a",
-        "login_button_text": "Kirish",
+        "One_ID_button_selector": "a[class='Login_button_link']",
+        "login_field_selector": "input[autocomplete='username']",
+        "password_field_selector": "input[autocomplete='current-password']",
+        "login_button_selector": "button[type='submit']",
         "success_url": "https://litsey.edu.uz/"
     },
     "syllabus": {
