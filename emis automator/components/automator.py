@@ -1,10 +1,7 @@
 import time
-import pathlib
-import openpyxl
 from playwright.sync_api import sync_playwright, Browser, Page
 from config_manager import JsonTwin
 import file_utils
-import excel_utils
 
 import os
 import sys
