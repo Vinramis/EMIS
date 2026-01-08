@@ -25,7 +25,7 @@ echo Проверяем подключение...
 echo.
 
 echo Подготавливаем компоненты...
-!PLAYWRIGHT! install
+!PLAYWRIGHT! install chromium >nul
 
 echo.
 
