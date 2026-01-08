@@ -19,36 +19,40 @@ def run_automation(headless: bool = False):
     print("Файл классной работы")
     print("Файл домашнего задания\n")
 
-
-    # 3. Автоматизация браузера
+    # 2. Автоматизация браузера
     with sync_playwright() as p:
         browser: Browser = p.chromium.launch(headless=headless).new_context(
-            storage_state="cookies.json", no_viewport=True
+            storage_state="cookies.json",
+            no_viewport=True
         )
         page: Page = browser.new_page()
 
-        # 5. Цикл автоматизации
+        # 3. Цикл автоматизации
         print("--- Запуск автоматизации ---")
         page.goto(selectors.get("new_topic_url"))
+
+        prefix = selectors.get("prefix")
+        topic_name_postfix = selectors.get("topic_name_postfix")
+        topic_file_postfix = selectors.get("topic_file_postfix")
+        homework_file_postfix = selectors.get("homework_file_postfix")
 
         counter = -1
         for topic_material in input_data_json.get():
             topic_material = JsonTwin(topic_material)
             counter += 1
-            # print(f"\n--- Обработка строки {counter + 1} из {len(input_data_json.get())} ---")
 
             topic_number = topic_material("topic_number")
             topic_name = topic_material("topic_name")
             topic_file_path = topic_material("classwork_file_path")
             homework_file_path = topic_material("homework_file_path")
 
-            topic_name_selector = f"{selectors.get('prefix')}{1000 + counter}{selectors.get('topic_name_postfix')}"
-            topic_file_selector = f"{selectors.get('prefix')}{1000 + counter}{selectors.get('topic_file_postfix')}"
-            homework_file_selector = f"{selectors.get('prefix')}{1000 + counter}{selectors.get('homework_file_postfix')}"
+            topic_name_selector = f"{prefix}{1000 + counter}{topic_name_postfix}"
+            topic_file_selector = f"{prefix}{1000 + counter}{topic_file_postfix}"
+            homework_file_selector = f"{prefix}{1000 + counter}{homework_file_postfix}"
 
             try:
                 page.locator(selectors.get("add_line_button")).click()
-                time.sleep(0.1)
+                # time.sleep(0.2)
 
                 print(f"\n{counter + 1}, {topic_number}. '{topic_name}'")
                 page.locator(topic_name_selector).fill(topic_name)

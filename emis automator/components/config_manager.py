@@ -11,7 +11,7 @@ import json
 
 class JsonTwin:
     def __init__(self, source: Union[str, pathlib.Path, dict, list, 'JsonTwin'] = None, root: 'JsonTwin' = None):
-        self._data: dict | list = None
+        self._data: dict | list = {}
         self._root: JsonTwin = root
         self.file_path: str = None
         # self.base_directory = pathlib.Path(__file__).parent
@@ -49,10 +49,10 @@ class JsonTwin:
         Retrieves a value. Returns a new JsonTwin for dicts/lists
         to allow chaining (e.g., twin.get('a').get('b')).
         """
+        if not isinstance(self._data, collections.abc.Iterable) or not self._data:
+            return None
         if key is None:
             return self._data
-        if not isinstance(self._data, collections.abc.Iterable):
-            return None
 
         result: Any = None
         if isinstance(self._data, dict):
@@ -137,6 +137,8 @@ class JsonTwin:
         self._save() if autosave else None
 
     def keys(self):
+        if not self._data:
+            return []
         return self._data.keys()
 
     def super_keys(self):
