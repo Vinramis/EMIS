@@ -1,6 +1,8 @@
 @echo off
-CHCP 65001 >nul
+chcp 65001 >nul
 setlocal enabledelayedexpansion
+chdir /d "%~dp0"
+
 :: Unarchived check
 if not exist "components\" (
     color 0c
@@ -58,7 +60,7 @@ echo Входим в EMIS...
 echo.
 
 echo Подготавливаем данные...
-del components/input_data.json
+del components/input_data.json >nul 2>&1
 !PYTHON! components/preparator.py
 
 echo.
