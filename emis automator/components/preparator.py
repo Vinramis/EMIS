@@ -98,7 +98,7 @@ def configure_input_data(
     """
     Configures input_data_json, using config_json as a reference.
     """
-    topics_file_path: str = normalize_path(config_json("topics_file_path"))
+    # topics_file_path: str = normalize_path(config_json("topics_file_path"))
     start_cell: str = config_json("start_cell")
     mode: str = config_json("mode")
     classwork_folder: str = config_json("classwork_folder")
@@ -114,13 +114,13 @@ def configure_input_data(
     end_on_line: int = max(classwork_interval[1], homework_interval[1])
     print(f"Выбраны темы от {start_from_line} до {end_on_line}.")
 
-    config_json["start_from_line"] = start_from_line
-    config_json["end_on_line"] = end_on_line
+    # config_json["start_from_line"] = start_from_line
+    # config_json["end_on_line"] = end_on_line
 
     # Try to get topics from topics_file_path
     try:
         topics_sheet = openpyxl.load_workbook(
-            filename=topics_file_path, data_only=True
+            filename=normalize_path("..\\КТП.xlsx"), data_only=True
         ).active
     except Exception:
         base_directory = Path(__file__).parent
@@ -128,7 +128,9 @@ def configure_input_data(
 
         topics_file_path = file_utils.find_single_excel(parent_directory)
         if topics_file_path:
-            config_json["topics_file_path"] = topics_file_path
+            topics_sheet = openpyxl.load_workbook(
+                filename=topics_file_path, data_only=True
+            ).active
         else:
             print(
                 f"Файл КТП не найден или не является единственным Excel файлом в {parent_directory}"
@@ -184,17 +186,11 @@ def get_cookies(
         page.wait_for_load_state("networkidle")
 
         if page.url != c("success_url"):
-
             print("Не получилось войти.")
             return None
         cookies = page.context.storage_state()
         browser.close()
         return dict(cookies)
-
-
-def extract_expires(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> int:
-    """Extracts expires from cookies.json"""
-    return cookies_json.super_get("expires")
 
 
 def hard_extract(
@@ -209,7 +205,7 @@ def hard_extract(
 
 def cookies_expired(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> bool:
     """Checks if cookies are expired"""
-    return int(hard_extract(cookies_json, "expires")) < time.time().__int__() + 30
+    return int(hard_extract(cookies_json, "expires")) < time.time().__int__() + 5 * 60
 
 
 def cookie_practice_check(
@@ -238,41 +234,48 @@ def ensure_login(
     headless: bool = True,
     looping: int = 3,
 ):
-    if cookies_json.get() and cookies_json.get() != {}:
-        if cookie_practice_check(
+    try:
+        if cookies_expired(cookies_json):
+            pass
+        elif cookie_practice_check(
             cookies_json.file_path, web_json("login"), headless=headless
         ):
             return
-    else:
-        os.remove(cookies_json.file_path)
-        if credentials_json("validity") == -1:
-            print(f"[ИНФО] При предыдущем входе произошла ошибка. Введите ваши учетные данные заново. Предыдущие данные: {credentials_json('login')},{credentials_json('password')}")
-            credentials_json["login"], credentials_json["password"] = ask_credentials()
-            credentials_json.set("validity", 0)
-        elif credentials_json("validity") != 1:
-            credentials_json["login"], credentials_json["password"] = ask_credentials()
-            credentials_json.set("validity", 0)
-        cookies = get_cookies(
-            login=credentials_json("login"),
-            password=credentials_json("password"),
-            configuration=web_json("login"),
-            headless=headless,
+    except Exception:
+        print("[ИНФО] Предыдущий вход больше не работает. Заново входим в EMIS...")
+    os.remove(cookies_json.file_path)
+
+    if credentials_json("validity") == -1:
+        print(
+            f"[ИНФО] При предыдущем входе произошла ошибка. Введите ваши учетные данные заново. Предыдущие данные: {credentials_json('login')}, {credentials_json('password')}\n"
         )
-        cookies_json.pull(cookies)
+        credentials_json["login"], credentials_json["password"] = ask_credentials()
+        credentials_json.set("validity", 0)
+
+    cookies = get_cookies(
+        login=credentials_json("login"),
+        password=credentials_json("password"),
+        configuration=web_json("login"),
+        headless=headless,
+    )
+    cookies_json.pull(cookies)
+
     if cookie_practice_check(
         cookies_json.file_path, web_json("login"), headless=headless
     ):
         credentials_json.set("validity", 1)
+        return
     else:
         credentials_json.set("validity", -1)
-        if looping > 0:
-            ensure_login(
-                cookies_json=cookies_json,
-                credentials_json=credentials_json,
-                web_json=web_json,
-                headless=headless,
-                looping=looping - 1,
-            )
+
+    if looping > 0:
+        ensure_login(
+            cookies_json=cookies_json,
+            credentials_json=credentials_json,
+            web_json=web_json,
+            headless=headless,
+            looping=looping - 1,
+        )
 
 
 if __name__ == "__main__":
