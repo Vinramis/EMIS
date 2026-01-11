@@ -151,22 +151,40 @@ def get_files(directory: str) -> list[str]:
     """
     directory = normalize_path(directory)
     found_items = os.listdir(directory)
+    found_items = [os.path.join(directory, file) for file in found_items]
     return [file for file in found_items if os.path.isfile(file)]
 
+
+def get_by_extensions(directory: str, extensions: list[str]) -> list[str]:
+    """
+    Returns the list of files in the directory with the specified extensions.
+    """
+    found_items = get_files(directory)
+    right_files = []
+    for extension in extensions:
+        for file in right_files:
+            found_items.remove(file)
+        for file in found_items:
+            if file.endswith(extension):
+                right_files.append(file)
+    return right_files
+
+def print_(text: str):
+    import colorama
+    print(f"{colorama.Fore.GREEN}{text}{colorama.Fore.RESET}")
 
 def get_by_extension(directory: str, extension: str) -> list[str]:
     """
     Returns the list of files in the directory with the specified extension.
     """
-    found_items = get_files(directory)
-    return [file for file in found_items if file.endswith(extension)]
+    return get_by_extensions(directory, [extension])
 
 
 def find_single_excel(directory: str) -> str:
     """
-    Returns the path to the single .xlsx file in the directory.
+    Returns the path to the single .xlsx or .xls file in the directory.
     """
-    excel_files = get_by_extension(directory, ".xlsx")
+    excel_files = get_by_extensions(directory, [".xlsx", ".xls"])
     if len(excel_files) == 1:
         return excel_files[0]
     return None
@@ -174,7 +192,7 @@ def find_single_excel(directory: str) -> str:
 
 def rename_single_excel(directory: str = "", new_name="КТП.xlsx"):
     """
-    Renames the single .xlsx file in the current directory to the specified name.
+    Renames the single .xlsx or .xls file in the current directory to the specified name.
     """
     # 1. Get list of all files in the current directory
     excel_file = find_single_excel(directory)

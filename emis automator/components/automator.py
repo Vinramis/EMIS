@@ -176,11 +176,11 @@ def print_line(
             if len(cut_topic_file_path) < cut_to_length[1]
             else " "
         )
-        homework_extender = (
-            " " * (cut_to_length[2] - len(cut_homework_file_path))
-            if len(cut_homework_file_path) < cut_to_length[2]
-            else " "
-        )
+        # homework_extender = (
+        #     " " * (cut_to_length[2] - len(cut_homework_file_path))
+        #     if len(cut_homework_file_path) < cut_to_length[2]
+        #     else " "
+        # )
         print(
             f"Строка {counter + 1}, тема {topic_number}. '{cut_topic_name}',{name_extender}'{cut_topic_file_path}',{classwork_extender}'{cut_homework_file_path}'"
         )

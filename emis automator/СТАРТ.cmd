@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-chdir /d "%~dp0"
+@REM chdir /d "%~dp0"
 
 :: Unarchived check
 if not exist "components\" (
@@ -20,6 +20,8 @@ title Автоматизатор EMIS v2.7.1
 :: Definitions
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
+set "CURRENT_DIR=%cd%"
+set "INPUT_DATA=%CURRENT_DIR%\components\input_data.json"
 @REM for /F "delims=#" %%a in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set "ESC=%%a"
 @REM syntax:
 @REM echo %ESC%[31mThis text is Red!%ESC%[0m
@@ -60,8 +62,9 @@ echo Входим в EMIS...
 echo.
 
 echo Подготавливаем данные...
-del components/input_data.json >nul 2>&1
+del "!INPUT_DATA!"
 !PYTHON! components/preparator.py
+if errorlevel 1 goto :error_exit
 
 echo.
 
@@ -79,7 +82,7 @@ if !mode! == 1 !PYTHON! components/automator.py
 if !mode! == 2 !PYTHON! components/enterer.py
 
 :: Closing window
-:exit
+:successfull_exit
 timeout /t 2 /nobreak >nul
 echo.
 echo.
@@ -89,3 +92,18 @@ echo.
 echo.
 echo.
 pause >nul
+goto :empty_exit
+
+:error_exit
+echo.
+echo.
+echo Что-то пошло не так. Нажмите Enter для выхода...
+echo (?) Можно просто закрыть это окно
+echo.
+echo.
+echo.
+pause >nul
+goto :empty_exit
+
+:empty_exit
+exit

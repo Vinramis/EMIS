@@ -2,6 +2,7 @@ import time
 import os
 import sys
 from pathlib import Path
+import colorama
 
 import openpyxl
 from playwright.sync_api import sync_playwright, Browser, Page
@@ -132,8 +133,8 @@ def configure_input_data(
                 filename=topics_file_path, data_only=True
             ).active
         else:
-            print(
-                f"Файл КТП не найден или не является единственным Excel файлом в {parent_directory}"
+            raise Exception(
+                f"Файл КТП не найден или не является единственным Excel файлом в '{parent_directory}'"
             )
 
     topics = excel_utils.read_topics_from_excel(
@@ -279,4 +280,9 @@ def ensure_login(
 
 
 if __name__ == "__main__":
-    test() if test_mode else main()
+    try:
+        test() if test_mode else main()
+    except Exception as e:
+        print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Fore.RESET}")
+        exit(1)
+
