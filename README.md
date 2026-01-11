@@ -11,7 +11,7 @@
 
 ## Установка
 
-1. Скачайте "**Автоматизатор EMIS v2.5**.zip" на свой компьютер, по ссылке [https://t.me/emis_automator](https://t.me/emis_automator) (или по тегу **@emis_automator** в Telegram)
+1. Скачайте "**Автоматизатор EMIS v2.7.1**.zip" на свой компьютер, по ссылке [https://t.me/emis_automator](https://t.me/emis_automator) (или по тегу **@emis_automator** в Telegram)
 2. Распакуйте архив (просто перетащите папку Automator из архива) на рабочий стол или в удобную для вас папку
 
 ## Проверка работоспособности и демонстрация
