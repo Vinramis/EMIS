@@ -6,6 +6,7 @@
         "password_field_placeholder": "Parolni kiriting",
         "login_button_text": "Kirish",
         "success_url": "https://litsey.edu.uz",
+        "all_topics_url": "https://litsey.edu.uz/teacher/topics",
         "new_topic_url": "https://litsey.edu.uz/teacher/topics/add",
         "prefix": "#topics_",
         "topic_name_postfix": "_name",
@@ -23,6 +24,7 @@
         "success_url": "https://litsey.edu.uz/"
     },
     "syllabus": {
+        "all_topics_url": "https://litsey.edu.uz/teacher/topics",
         "new_topic_url": "https://litsey.edu.uz/teacher/topics/add",
         "prefix": "#topics_",
         "topic_name_postfix": "_name",

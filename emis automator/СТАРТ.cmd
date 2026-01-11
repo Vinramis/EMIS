@@ -12,10 +12,13 @@ if not exist "components\" (
 :: Activate fullscreen mode
 if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 
+:: Set title
+title Автоматизатор EMIS v2.7.1
+
 :: Definitions
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
-for /F "delims=#" %%a in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set "ESC=%%a"
+@REM for /F "delims=#" %%a in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set "ESC=%%a"
 @REM syntax:
 @REM echo %ESC%[31mThis text is Red!%ESC%[0m
 @REM colors:
@@ -28,9 +31,6 @@ for /F "delims=#" %%a in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set "ESC=
 @REM 36m = Cyan
 @REM 37m = White
 
-:: Set title
-title Автоматизатор EMIS v2.6
-
 :: Welcome user
 echo.
 echo.
@@ -41,19 +41,24 @@ echo.
 echo.
 
 :: Sequence
-echo %ESC%[36mПроверяем подключение...%ESC%[0m
+echo Проверяем подключение...
 !PYTHON! components/connection_check.py internet
 
 echo.
 
-echo %ESC%[36mПодготавливаем компоненты...%ESC%[0m
+echo Подготавливаем компоненты...
 !PLAYWRIGHT! install chromium >nul
 
 echo.
 
-echo %ESC%[36mВходим в EMIS...%ESC%[0m
+echo Входим в EMIS...
 !PYTHON! components/preparator.py --login
-!PYTHON! components/connection_check.py all cookies.json
+!PYTHON! components/connection_check.py emis cookies.json
+
+echo.
+
+echo Подготавливаем данные...
+del components/input_data.json
 !PYTHON! components/preparator.py
 
 echo.
@@ -73,6 +78,7 @@ if !mode! == 2 !PYTHON! components/enterer.py
 
 :: Closing window
 :exit
+timeout /t 2 /nobreak >nul
 echo.
 echo.
 echo Кажется, браузер закрыт. Нажмите Enter для выхода...

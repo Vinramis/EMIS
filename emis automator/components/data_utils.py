@@ -152,3 +152,9 @@ def compare_sentences(
     developer_mode: bool = False,
 ) -> Union[float, list[list[float]]]:
     pass
+
+
+def cut_string(string: str, *, to_length: int = 20, ellipsis: str = "...") -> str:
+    if len(string) > to_length:
+        return string[:to_length - len(ellipsis)] + ellipsis
+    return string

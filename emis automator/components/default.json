@@ -1,10 +1,7 @@
 {
     "config.json": {
-        "topics_file_path": "..\\КТП.xlsx",
         "start_cell": "B6",
         "mode": "col",
-        "start_topic": 0,
-        "end_topic": 0,
         "classwork_folder": "..\\КЛ",
         "homework_folder": "..\\ДЗ"
     },
