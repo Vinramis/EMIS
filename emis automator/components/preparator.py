@@ -163,9 +163,9 @@ def configure_input_data(
 def ensure_json_validity(target_json: JsonTwin, its_default: JsonTwin) -> bool:
     """Check for it's existance and for entries. If it doesn't exist it will not pass the difference check."""
     if target_json.super_keys().difference(its_default.super_keys()):
-        target_json.pull(its_default)
-        return False
-    return True
+        # target_json.pull(its_default)
+        return its_default
+    return target_json
 
 
 def get_cookies(
@@ -232,6 +232,7 @@ def ensure_login(
     cookies_json: JsonTwin = JsonTwin("cookies.json"),
     credentials_json: JsonTwin = JsonTwin("credentials.json"),
     web_json: JsonTwin = JsonTwin("web.json"),
+    default_json: JsonTwin = JsonTwin("default.json"),
     headless: bool = True,
     looping: int = 3,
 ):
@@ -246,12 +247,13 @@ def ensure_login(
         print("[ИНФО] Предыдущий вход больше не работает. Заново входим в EMIS...")
     os.remove(cookies_json.file_path)
 
-    if credentials_json("validity") == -1:
-        print(
-            f"[ИНФО] При предыдущем входе произошла ошибка. Введите ваши учетные данные заново. Предыдущие данные: {credentials_json('login')}, {credentials_json('password')}\n"
-        )
+    if credentials_json("validity") != 1:
+        if credentials_json("validity") == -1:
+            print(
+                f"[ИНФО] При предыдущем входе произошла ошибка. Введите ваши учетные данные заново. Предыдущие данные: {credentials_json('login')}, {credentials_json('password')}\n"
+            )
         credentials_json["login"], credentials_json["password"] = ask_credentials()
-        credentials_json.set("validity", 0)
+        credentials_json.set("validity", 1)
 
     cookies = get_cookies(
         login=credentials_json("login"),

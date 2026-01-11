@@ -55,7 +55,7 @@ class JsonTwin:
             remove(self.file_path)
         del self
 
-    def get(self, key: Union[str, int] = None, strict: bool = False) -> Any:
+    def get(self, key: Union[str, int] = None, strict: bool = True) -> Any:
         """
         Retrieves a value. Returns a new JsonTwin for dicts/lists
         to allow chaining (e.g., twin.get('a').get('b')).

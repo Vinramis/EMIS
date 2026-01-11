@@ -15,7 +15,7 @@ if not exist "components\" (
 if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 
 :: Set title
-title Автоматизатор EMIS v2.7.1
+title Автоматизатор EMIS v2.7.2
 
 :: Definitions
 set "PYTHON="components\python314\python""
@@ -57,7 +57,9 @@ echo.
 
 echo Входим в EMIS...
 !PYTHON! components/preparator.py --login
+if errorlevel 1 goto :error_exit
 !PYTHON! components/connection_check.py emis cookies.json
+if errorlevel 1 goto :error_exit
 
 echo.
 

@@ -8,14 +8,14 @@
     "credentials.json": {
         "login": "",
         "password": "",
-        "validity": 0
+        "validity": -1
     },
-    "input_data.json": {
-        "0": {
+    "input_data.json": [
+        {
             "topic_number": 0,
             "topic_name": "",
             "classwork_file_path": "",
             "homework_file_path": ""
         }
-    }
+    ]
 }
