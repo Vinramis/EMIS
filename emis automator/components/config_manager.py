@@ -14,9 +14,11 @@ class JsonTwin:
         self._data: dict | list = {}
         self._root: JsonTwin = root
         self.file_path: str = None
+        self.true_file_twin: bool = True
         # self.base_directory = pathlib.Path(__file__).parent
 
         if isinstance(source, JsonTwin):
+            self.true_file_twin = False
             self._data = source._data
             if not self._root:
                 self._root = source
@@ -25,6 +27,8 @@ class JsonTwin:
             self._load_or_create()
         elif isinstance(source, Union[dict, list]):
             self._data = source
+        if root:
+            self.true_file_twin = False
 
     def _load_or_create(self):
         """Try to load the file; if missing or corrupt, initialize a new one."""
@@ -43,6 +47,13 @@ class JsonTwin:
             # self.file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.file_path, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, ensure_ascii=False, indent=4)
+
+    def remove(self):
+        from os import remove
+        from os.path import exists
+        if self.file_path and not self.true_file_twin and exists(self.file_path):
+            remove(self.file_path)
+        del self
 
     def get(self, key: Union[str, int] = None, strict: bool = False) -> Any:
         """
