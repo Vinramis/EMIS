@@ -182,7 +182,7 @@ def print_line(
             else " "
         )
         print(
-            f"Строка {counter + 1}, тема {topic_number}. '{cut_topic_name}',{name_extender}'{cut_topic_file_path}',{classwork_extender}'{cut_homework_file_path}'{homework_extender}"
+            f"Строка {counter + 1}, тема {topic_number}. '{cut_topic_name}',{name_extender}'{cut_topic_file_path}',{classwork_extender}'{cut_homework_file_path}'"
         )
     else:
         print(
