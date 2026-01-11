@@ -67,7 +67,7 @@ def emis_is_up(
 
 def internet_available():
     if not check_connection():
-        print("\n[ИНФО] Отсутствует подключение к интернету.")
+        print("[ИНФО] Отсутствует подключение к интернету.")
         print("(?) Восстановите подключение, не закрывайте это окно.")
         wait_for(function=lambda: check_connection(), to_be=True, check_interval=3)
         print("[ИНФО] Подключение к интернету восстановлено.")
@@ -75,7 +75,7 @@ def internet_available():
 
 def emis_available(login_information: str = "cookies.json"):
     if not emis_is_up(login_information=login_information):
-        print("\n[ИНФО] EMIS сейчас недоступен.")
+        print("[ИНФО] EMIS сейчас недоступен.")
         print(
             "(?) Работа автоматически продолжится когда EMIS станет доступен, не закрывайте это окно."
         )
