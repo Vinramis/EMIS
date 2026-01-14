@@ -4,12 +4,7 @@ setlocal enabledelayedexpansion
 @REM chdir /d "%~dp0"
 
 :: Unarchived check
-if not exist "components\" (
-    color 0c
-    echo Вы запустили программу неправильно. Пожалуйста, следуйте инструкции.
-    set /p dummy=Нажмите Enter для выхода...
-    exit
-)
+if not exist "components\" goto :archived_exit
 
 :: Activate fullscreen mode
 if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
@@ -21,7 +16,7 @@ title Автоматизатор EMIS v2.7.2
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
 set "CURRENT_DIR=%cd%"
-set "INPUT_DATA=%CURRENT_DIR%\components\input_data.json"
+set "INPUT_DATA="%CURRENT_DIR%\components\input_data.json""
 @REM for /F "delims=#" %%a in ('prompt #$E# ^& for %%a in ^(1^) do rem') do set "ESC=%%a"
 @REM syntax:
 @REM echo %ESC%[31mThis text is Red!%ESC%[0m
@@ -51,7 +46,7 @@ echo Проверяем подключение...
 echo.
 
 echo Подготавливаем компоненты... (это может занять некоторое время)
-!PLAYWRIGHT! install chromium >nul
+!PLAYWRIGHT! install chromium >nul 2>&1
 
 echo.
 
@@ -64,7 +59,7 @@ if errorlevel 1 goto :error_exit
 echo.
 
 echo Подготавливаем данные...
-del "!INPUT_DATA!"
+del %INPUT_DATA%
 !PYTHON! components/preparator.py
 if errorlevel 1 goto :error_exit
 
@@ -100,6 +95,19 @@ goto :empty_exit
 echo.
 echo.
 echo Что-то пошло не так. Нажмите Enter для выхода...
+echo (?) Можно просто закрыть это окно
+echo.
+echo.
+echo.
+pause >nul
+goto :empty_exit
+
+:archived_exit
+echo.
+echo.
+color 0c
+echo Вы запустили программу не распаковав архив. Пожалуйста, вернитесь к инструкции.
+echo Нажмите Enter для выхода...
 echo (?) Можно просто закрыть это окно
 echo.
 echo.
