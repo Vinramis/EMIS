@@ -1,0 +1,14 @@
+{
+    "version": "2.7.2",
+    "automator.py": "1",
+    "enterer.py": "1",
+    "config_manager.py": "1",
+    "data_utils.py": "1",
+    "excel_utils.py": "1",
+    "file_utils.py": "1",
+    "preparator.py": "1",
+    "connection_check.py": "1",
+    "default.json": "1",
+    "config.json": "1",
+    "web.json": "1"
+}

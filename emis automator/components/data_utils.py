@@ -8,7 +8,7 @@ def numbers_in_string(string: str) -> list[int]:
         if char.isdigit():
             number_buffer += char
         else:
-            if number_buffer:
+            if number_buffer != "":
                 numbers_found.append(int(number_buffer))
                 number_buffer = ""
     return numbers_found

@@ -66,17 +66,19 @@ class JsonTwin:
             return self._data
 
         result: Any = None
-        if isinstance(self._data, dict):
-            if key in self._data.keys():
-                result = self._data[key]
+        result = self._data[key]
+        # if isinstance(self._data, dict):
+        #     if key in self._data.keys():
+        #         result = self._data[key]
 
-            if not strict and not result:
-                for k in self._data.keys():
-                    if compare_two_words(key, k):
-                        result = self._data[k]
-        elif isinstance(self._data, list):
-            if key in range(len(self._data)):
-                result = self._data[key]
+        #     if not strict and not result:
+        #         for k in self._data.keys():
+        #             if compare_two_words(key, k):
+        #                 result = self._data[k]
+        # elif isinstance(self._data, list):
+        #     result = self._data[key]
+        #     # if key in range(len(self._data)):
+        #     #     result = self._data[key]
 
         if isinstance(result, (dict, list)):
             result = JsonTwin(result, self)

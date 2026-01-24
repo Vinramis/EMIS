@@ -1,5 +1,6 @@
 # WORK IN PROGRESS
 
+import file_utils
 import time
 
 # import json
@@ -11,9 +12,7 @@ import excel_utils
 from file_utils import normalize_path
 
 FIELD_SELECTOR_PART1 = "#StudyGuide_data_"
-FIELD_SELECTOR_PART2 = (
-    "_topic_id"  # must be concatenated with index in the middle (from 0)
-)
+FIELD_SELECTOR_PART2 = "_topic_id"  # must be concatenated with index in the middle (from 0)
 VIRTUAL_LIST_SELECTOR = "div.ant-select-item-option-content"
 # VIRTUAL_LIST_PLACEHOLDER = "" # name of the topic you have
 
@@ -21,10 +20,9 @@ VIRTUAL_LIST_SELECTOR = "div.ant-select-item-option-content"
 def enter_topics_program():
     directory: str = os.path.dirname(__file__)
     os.chdir(directory)
-    syllabus_path: str = normalize_path("..\КТП.xlsx")
+    syllabus_path: str = file_utils.find_single_excel(os.path.dirname(directory))
     syllabus: openpyxl.Worksheet = openpyxl.load_workbook(syllabus_path).active
     topics: list[str] = excel_utils.read_topics_from_excel(syllabus)
-    print(topics)
 
     with sync_playwright() as p:
         browser: Browser = p.firefox.launch(headless=False)
