@@ -17,7 +17,7 @@
     
     "login": {
         "One_ID_login_url": "https://litsey.edu.uz/login",
-        "One_ID_button_selector": "a[class='Login_button_link']",
+        "One_ID_button_selector": "a[class='_OneIdLink_w2abp_13']",
         "login_field_selector": "input[autocomplete='username']",
         "password_field_selector": "input[autocomplete='current-password']",
         "login_button_selector": "button[type='submit']",

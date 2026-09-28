@@ -37,7 +37,7 @@ def test():
     )
 
 
-def main():
+def main(browser: Browser = None):
     # Load all configurations
     default_json: JsonTwin = JsonTwin("default.json")
 
@@ -47,13 +47,13 @@ def main():
     input_data_json: JsonTwin = JsonTwin("input_data.json")
     web_json: JsonTwin = JsonTwin("web.json")
 
-    headless = True
+    headless = False
     if "--not-headless" in sys.argv:
         headless = False
 
-    if len(sys.argv) > 1:
-        if "--login" in sys.argv:
-            ensure_login(headless=headless)
+    if "--login" in sys.argv:
+        ensure_login(headless=headless)
+
     else:
         # Ensure config.json is valid
         ensure_json_validity(config_json, default_json("config.json"))
@@ -183,12 +183,15 @@ def get_cookies(
 
         page.fill(c("login_field_selector"), login)
         page.fill(c("password_field_selector"), password)
-        page.click(c("login_button_selector"))
-        page.wait_for_load_state("networkidle")
+        
+        # page.click(c("login_button_selector"))
+        # TEMPORARY
+        while page.evaluate("window.location.href") != c("success_url"):
+            time.sleep(1)
 
-        if page.url != c("success_url"):
+        if page.evaluate("window.location.href") != c("success_url"):
             print("Не получилось войти.")
-            return None
+        #     return None
         cookies = page.context.storage_state()
         browser.close()
         return dict(cookies)
@@ -206,7 +209,7 @@ def hard_extract(
 
 def cookies_expired(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> bool:
     """Checks if cookies are expired"""
-    return int(hard_extract(cookies_json, "expires")) < time.time().__int__() + 5 * 60
+    return float(hard_extract(cookies_json, "expires")) < time.time().__float__() + 5 * 60
 
 
 def cookie_practice_check(
@@ -223,7 +226,8 @@ def cookie_practice_check(
         page: Page = browser.new_page()
         page.goto(c("One_ID_login_url"))
         page.wait_for_load_state("networkidle")
-        return_value = page.url == c("success_url")
+        return_value = page.evaluate("window.location.href") == c("success_url")
+        print(page.evaluate("window.location.href"), c("success_url"), return_value)
         browser.close()
         return return_value
 
@@ -235,17 +239,13 @@ def ensure_login(
     default_json: JsonTwin = JsonTwin("default.json"),
     headless: bool = True,
     looping: int = 3,
-):
-    try:
-        if cookies_expired(cookies_json):
-            pass
-        elif cookie_practice_check(
-            cookies_json.file_path, web_json("login"), headless=headless
-        ):
-            return
+) -> None:
+    try: 
+        if not cookies_expired(cookies_json): return
+        else: os.remove(cookies_json.file_path)
     except Exception:
-        print("[ИНФО] Предыдущий вход больше не работает. Заново входим в EMIS...")
-    os.remove(cookies_json.file_path)
+        pass
+    print("[ИНФО] Предыдущий вход больше не работает. Заново входим в EMIS...")
 
     if credentials_json("validity") != 1:
         if credentials_json("validity") == -1:
@@ -262,14 +262,15 @@ def ensure_login(
         headless=headless,
     )
     cookies_json.pull(cookies)
+    credentials_json.set("validity", 1)
 
-    if cookie_practice_check(
-        cookies_json.file_path, web_json("login"), headless=headless
-    ):
-        credentials_json.set("validity", 1)
-        return
-    else:
-        credentials_json.set("validity", -1)
+    # if cookie_practice_check(
+    #     cookies_json.file_path, web_json("login"), headless=headless
+    # ):
+    #     credentials_json.set("validity", 1)
+    #     return
+    # else:
+    #     credentials_json.set("validity", -1)
 
     if looping > 0:
         ensure_login(
