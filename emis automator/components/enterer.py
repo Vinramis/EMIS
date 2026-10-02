@@ -1,23 +1,20 @@
 # WORK IN PROGRESS
 
 import file_utils
-import time
+# import time
 
-# import json
 import os
 import playwright
 from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
 import openpyxl
 import excel_utils
 
-# from file_utils import normalize_path
 from config_manager import JsonTwin
 
 FIELD_SELECTOR_PART1 = "#StudyGuide_data_"
 FIELD_SELECTOR_PART2 = "_topic_id"  # must be concatenated with index in the middle (from 0)
 VIRTUAL_LIST_SELECTOR = "div.ant-select-item-option-content"
 CHOOSER_FIELD_SELECTOR = "input[class='ant-select-input']"
-# VIRTUAL_LIST_PLACEHOLDER = "" # name of the topic you have
 
 config_json = JsonTwin("config.json")
 
