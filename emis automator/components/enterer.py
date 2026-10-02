@@ -16,6 +16,7 @@ from config_manager import JsonTwin
 FIELD_SELECTOR_PART1 = "#StudyGuide_data_"
 FIELD_SELECTOR_PART2 = "_topic_id"  # must be concatenated with index in the middle (from 0)
 VIRTUAL_LIST_SELECTOR = "div.ant-select-item-option-content"
+CHOOSER_FIELD_SELECTOR = "input[class='ant-select-input']"
 # VIRTUAL_LIST_PLACEHOLDER = "" # name of the topic you have
 
 config_json = JsonTwin("config.json")
@@ -73,16 +74,15 @@ def enter_topics_program():
         # page.goto("https://litsey.edu.uz/teacher/groups/preview/3315/subject/34?name=Algebra+%28Chuqurlashtirilgan+fanlar%29&group_number=1&tab=study-guide")
         # page.fill("input[id='rc_select_0']", "Алгебра 2 курс")
         # page.keyboard.press("Enter")
+
         fields_count = int((len(page.locator("input[class='ant-select-input']").all()) - 1) / 2)
 
-        # all: int = 0
         success: int = 0
         first = int(input("Введите номер первой темы: ")) - 1
         topics = topics[first:]
         for i in range(min(fields_count, len(topics))):
             if enter_topic(page, i, topics[i])[0]:
                 success += 1
-            # all += 1
         print(f"[ИНФО] Успешно заполнено {success} из {fields_count}.")
 
         # page.locator("button").filter(has_text="Saqlash").click()
@@ -102,8 +102,6 @@ def enter_topics_program():
                 if page.is_closed():
                     break
                 continue
-
-        # time.sleep(1)
 
 
 def enter_topic(page: Page, count: int, name: str) -> tuple[bool, bool]:
