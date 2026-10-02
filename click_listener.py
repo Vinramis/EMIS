@@ -1,5 +1,5 @@
 import asyncio
-from playwright.async_api import async_playwright, Page, Browser
+from playwright.async_api import async_playwright
 import pathlib
 
 
@@ -8,11 +8,9 @@ async def main():
         directory = pathlib.Path(__file__).parent
         cookies_path = directory / "emis automator\components\cookies.json"
 
-        browser: Browser = await p.chromium.launch(headless=False)
-
-        # browser = await browser.new_context(storage_state=cookies_path)
-
-        page: Page = await browser.new_page()
+        browser = await p.chromium.launch(headless=False)
+        browser = await browser.new_context(storage_state=cookies_path)
+        page = await browser.new_page()
 
         # 1. Create the bridge between JS and Python
         async def log_click_binding(source: dict, details: dict):

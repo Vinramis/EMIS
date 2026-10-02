@@ -2,7 +2,7 @@ import pathlib
 import collections.abc
 from typing import Union, Any
 from file_utils import normalize_path
-from data_utils import compare_two_words
+# from data_utils import compare_two_words
 
 import json
 # import openpyxl
@@ -10,8 +10,12 @@ import json
 
 
 class JsonTwin:
-    def __init__(self, source: Union[str, pathlib.Path, dict, list, 'JsonTwin'] = None, root: 'JsonTwin' = None):
-        self._data: dict | list = {}
+    def __init__(self, source: Union[str, pathlib.Path, dict, list, 'JsonTwin'] = None, root: 'JsonTwin' = None, is_dict: bool = True):
+        self._data: dict | list
+        if is_dict:
+            self._data = {}
+        else:
+            self._data = []
         self._root: JsonTwin = root
         self.file_path: str = None
         self.true_file_twin: bool = True
@@ -55,7 +59,7 @@ class JsonTwin:
             remove(self.file_path)
         del self
 
-    def get(self, key: Union[str, int] = None, strict: bool = True) -> Any:
+    def get(self, key: Union[str, int] = None, *, strict: bool = True) -> Any:
         """
         Retrieves a value. Returns a new JsonTwin for dicts/lists
         to allow chaining (e.g., twin.get('a').get('b')).
@@ -104,7 +108,7 @@ class JsonTwin:
                     return self.get(k).super_get(key)
         return None
 
-    def set(self, key: Union[str, int], value: Any, autosave: bool = True) -> None:
+    def set(self, key: Union[str, int], value: Any, *, autosave: bool = True) -> None:
         """Sets a value."""
         # setdefault creates the section dict if it doesn't exist
         if not self._data:
@@ -141,6 +145,9 @@ class JsonTwin:
             # 2. Get the next level as a Twin so it can handle the next recursion
             next_level: JsonTwin = self.get(keys[0])
             next_level.super_set(keys[1:], value)
+
+    def length(self):
+        return len(self._data)
 
     def pull(self, source: 'JsonTwin' | dict, autosave: bool = True) -> None:
         try:

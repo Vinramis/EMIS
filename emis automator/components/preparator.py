@@ -37,7 +37,7 @@ def test():
     )
 
 
-def main(browser: Browser = None):
+def main(browser: Browser = None) -> None:
     # Load all configurations
     default_json: JsonTwin = JsonTwin("default.json")
 
@@ -173,7 +173,7 @@ def get_cookies(
     password: str,
     configuration: JsonTwin = JsonTwin("web.json")("login"),
     headless: bool = True,
-):
+) -> dict:
     c: JsonTwin = configuration
     with sync_playwright() as p:
         browser: Browser = p.chromium.launch(headless=headless)
@@ -197,19 +197,36 @@ def get_cookies(
         return dict(cookies)
 
 
-def hard_extract(
-    target_json: JsonTwin = JsonTwin("cookies.json"), key: str = "expires"
-) -> str:
-    """Extracts literal value from a JsonTwin"""
+# DEPRECATED
+# def hard_extract(
+#     target_json: JsonTwin = JsonTwin("cookies.json"), key: str = "expires"
+# ) -> str:
+#     """Extracts first literal value from a JsonTwin"""
+#     data = target_json.to_string(beautiful=False)
+#     value_chunk = data.split(key)[1].split(",")[0]
+#     value = value_chunk[2:].strip()
+#     return value
+
+
+def hard_extract_all(target_json: JsonTwin = JsonTwin("cookies.json"), key: str = "expires") -> list:
+    """Extracts all literal values for a key from a JsonTwin"""
+    occurrences = []
+    # It should also be brute force, so again .to_string
     data = target_json.to_string(beautiful=False)
-    value_chunk = data.split(key)[1].split(",")[0]
-    value = value_chunk[2:].strip()
-    return value
+    # Split the data by the key and then by commas to get all occurrences
+    parts = data.split(key)
+    for part in parts[1:]:
+        value_chunk = part.split(",")[0]
+        value = value_chunk[2:].strip()
+        occurrences.append(value)
+    return occurrences
 
 
 def cookies_expired(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> bool:
     """Checks if cookies are expired"""
-    return float(hard_extract(cookies_json, "expires")) < time.time().__float__() + 5 * 60
+    float_expirations = [float(exp) for exp in hard_extract_all(cookies_json, "expires")]
+    smallest_expiration = min(float_expirations)
+    return smallest_expiration < time.time().__float__() + 5 * 60
 
 
 def cookie_practice_check(

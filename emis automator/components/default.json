@@ -17,5 +17,9 @@
             "classwork_file_path": "",
             "homework_file_path": ""
         }
-    ]
+    ],
+    "current_settings.json": {
+        "working_directory": "",
+        "automation_mode": ""
+    }
 }

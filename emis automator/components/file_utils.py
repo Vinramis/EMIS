@@ -1,15 +1,19 @@
 import os
+import shutil
 import time
 from data_utils import numbers_in_string
 
 
-def extract_files(folder_path: str, case_insensitivity: bool, infix: list[str] | str):
+def extract_files(
+    folder_path: str, case_insensitivity: bool, infix: list[str] | str
+) -> list[str]:
     """
     Finds files in the specified folder by infixes in the filename, returns a list of filenames.
     """
+    matched_files = []
+
     try:
         all_files = os.listdir(folder_path)
-        matched_files = []
         if isinstance(infix, str):
             infix = [infix]
 
@@ -31,6 +35,43 @@ def extract_files(folder_path: str, case_insensitivity: bool, infix: list[str] |
 
     except Exception as e:
         print(f"[ОШИБКА] Ошибка при извлечении файлов: {e}")
+        exit(0)
+
+    return matched_files
+
+
+def filter_files(files: list[str], infix: list[str] | str, *, case_tolerant: bool = True) -> list[str]:
+    """
+    Filters files by infixes in the filename, returns a list of filenames.
+    """
+    matched_files = []
+
+    case_insensitive = case_tolerant
+    search_files = files
+    formalized_infix = infix
+    if isinstance(infix, str):
+        formalized_infix = [infix]
+    if not case_insensitive:
+        search_files = [file.lower() for file in search_files]
+        formalized_infix = [inf.lower() for inf in formalized_infix]
+
+    try:
+        files_to_check = list(search_files)
+        processed_files = set()
+
+        for inf in formalized_infix:
+            for i in range(len(files_to_check)):
+                check_file = files_to_check[i]
+                if check_file in processed_files:
+                    continue
+
+                if inf in check_file:
+                    print(f"{inf} in {check_file}")
+                    matched_files.append(files[i])
+                    processed_files.add(check_file)
+
+    except Exception as e:
+        print(f"[ОШИБКА] Ошибка при фильтрации файлов: {e}")
         exit(0)
 
     return matched_files
@@ -145,6 +186,17 @@ def organize_files(topics_folder: str, homework_folder: str) -> tuple[str, str]:
     return topics_folder, homework_folder
 
 
+def actually_organize_files(
+    files: list[str],
+    classwork_keywords: list[str] = ["кл", "лек", "урок"],
+    homework_keywords: list[str] = ["дз", "дом"],
+    case_tolerant: bool = True,
+) -> tuple[list[str], list[str]]:
+    classwork_files = filter_files(files, classwork_keywords, case_tolerant=case_tolerant)
+    homework_files = filter_files(files, homework_keywords, case_tolerant=case_tolerant)
+    return classwork_files, homework_files
+
+
 def get_files(directory: str) -> list[str]:
     """
     Returns the list of files in the directory.
@@ -169,9 +221,12 @@ def get_by_extensions(directory: str, extensions: list[str]) -> list[str]:
                 right_files.append(file)
     return right_files
 
+
 def print_(text: str):
     import colorama
+
     print(f"{colorama.Fore.GREEN}{text}{colorama.Fore.RESET}")
+
 
 def get_by_extension(directory: str, extension: str) -> list[str]:
     """
@@ -270,3 +325,29 @@ def pure_name(path) -> str:
     """
     path = normalize_path(path)
     return os.path.basename(path)
+
+
+if __name__ == "__main__":
+    directory = "C:\\Users\\rmura\\OneDrive\\Рабочий стол\\EMIS is shit\\emis automator\\КЛ и ДЗ"
+    all = os.listdir(directory)
+    all = [os.path.join(directory, f) for f in all]
+
+    class_files, homework_files = actually_organize_files(
+        all,
+        classwork_keywords=["урок"],
+        homework_keywords=["ДЗ"],
+        case_tolerant=False,
+    )
+
+    for file in class_files:
+        print(pure_name(file))
+
+    print("")
+
+    for file in homework_files:
+        print(pure_name(file))
+
+
+    for f in class_files:
+        
+        shutil.move(f, r"C:\Users\rmura\OneDrive\Рабочий стол\EMIS is shit\emis automator\КЛ ЧЕК")
