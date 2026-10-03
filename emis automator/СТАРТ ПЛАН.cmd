@@ -7,6 +7,8 @@ if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
 :: Define python path
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
+:: Tell playwright to use packaged browser files
+set PLAYWRIGHT_BROWSERS_PATH=0
 :: Set title
 title Автоматизатор EMIS
 :: Welcome user

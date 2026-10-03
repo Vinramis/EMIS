@@ -27,7 +27,7 @@ def enter_topics_program():
     topics: list[str] = excel_utils.read_topics_from_excel(syllabus, start_cell=config_json("start_cell"))
 
     with sync_playwright() as p:
-        browser: Browser = p.firefox.launch(headless=False)
+        browser: Browser = p.chromium.launch(headless=False)
         browser: BrowserContext = browser.new_context(
             storage_state="cookies.json", no_viewport=True
         )
