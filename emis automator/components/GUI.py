@@ -30,7 +30,7 @@ class AutomatorGUI(ctk.CTk):
 
         # Window Setup
         # self.iconbitmap("components/icon.ico")
-        self.title("Автоматизатор EMIS v2.7.2")
+        self.title("Автоматизатор EMIS v3.0")
         self.geometry("850x600")
         # self.resizable(False, False)
         self.minsize(700, 600)
