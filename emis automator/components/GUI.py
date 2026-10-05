@@ -20,7 +20,7 @@ from gui_elements import (
 
 # --- INITIALIZATION ---
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# ctk.set_appearance_mode("light")
+ctk.set_appearance_mode("light")
 # ctk.set_default_color_theme("blue")
 
 
