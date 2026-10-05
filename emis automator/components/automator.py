@@ -22,9 +22,7 @@ def run_automation(headless: bool = False):
 
     # 2. Автоматизация браузера
     with sync_playwright() as p:
-        browser: Browser = p.chromium.launch(headless=headless).new_context(
-            storage_state="cookies.json", no_viewport=True
-        )
+        browser: Browser = p.chromium.launch(headless=headless).new_context(storage_state="cookies.json", no_viewport=True)
         page: Page = browser.new_page()
 
         # 3. Цикл автоматизации

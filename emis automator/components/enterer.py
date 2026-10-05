@@ -28,9 +28,7 @@ def enter_topics_program():
 
     with sync_playwright() as p:
         browser: Browser = p.chromium.launch(headless=False)
-        browser: BrowserContext = browser.new_context(
-            storage_state="cookies.json", no_viewport=True
-        )
+        browser: BrowserContext = browser.new_context(storage_state="cookies.json", no_viewport=True)
         page: Page = browser.new_page()
         page.goto("https://litsey.edu.uz/teacher/groups")
 
