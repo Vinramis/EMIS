@@ -1,16 +1,20 @@
 @echo off
-CHCP 65001 >nul
+chcp 65001 >nul
 setlocal enabledelayedexpansion
+
+:: Unarchived check
+chdir /d "%~dp0"
+if not exist "components\" goto :archived_exit
 
 :: Activate fullscreen mode
 if not "%1"=="max" start /MAX cmd /c %0 max & exit/b
-:: Define python path
+title Автоматизатор EMIS
+
+:: Definitions
 set "PYTHON="components\python314\python""
 set "PLAYWRIGHT=!PYTHON! -m playwright"
-:: Tell playwright to use packaged browser files
 set PLAYWRIGHT_BROWSERS_PATH=0
-:: Set title
-title Автоматизатор EMIS
+
 :: Welcome user
 echo.
 echo.
@@ -20,7 +24,10 @@ echo.
 echo.
 echo.
 
+
+
 :: Sequence
+
 echo Проверяем подключение...
 !PYTHON! components/connection_check.py internet
 
@@ -32,30 +39,32 @@ echo Подготавливаем компоненты...
 echo.
 
 echo Входим в EMIS...
-@REM  !PYTHON! components/preparator.py --login
-@REM  !PYTHON! components/connection_check.py all cookies.json
 !PYTHON! components/preparator.py
 
 echo.
 
-@REM echo Режимы автоматизации:
-@REM echo     1 - План предмета (темы, классные и домашние работы; на вкладке "Mavzular" / "Темы")
-@REM echo     2 - План группы (темы; на вкладке "Guruhlar" / "Группы")
-@REM echo.
-@REM choice /C:12 /N /M "Выберите режим (нужная цифра): "
-@REM set mode=%errorlevel%
+echo Режимы автоматизации:
+echo     1 - План предмета (темы, классные и домашние работы; на вкладке "Mavzular" / "Темы")
+echo     2 - План группы (темы; на вкладке "Guruhlar" / "Группы")
+echo.
+choice /C:12 /N /M "Выберите режим (нужная цифра): "
+set mode=%errorlevel%
 @REM :: only take one digit, when one digit is entered, automatically take it (no enter)
 
-set mode=1
+echo.
+echo.
 
 if !mode! == 1 (
+    echo Выбиран режим "План предмета"...
     !PYTHON! components/automator.py
 ) else if !mode! == 2 (
+    echo Выбиран режим "План группы"...
     !PYTHON! components/enterer.py
 )
+goto :exit
 
 
-:: Closing window
+
 :exit
 echo.
 echo.
@@ -65,3 +74,19 @@ echo.
 echo.
 echo.
 pause >nul
+goto :empty_exit
+
+:archived_exit
+echo.
+echo.
+color 0c & echo Вы запустили программу не распаковав архив. Пожалуйста, вернитесь к инструкции.
+echo Нажмите Enter для выхода...
+echo (?) Можно просто закрыть это окно
+echo.
+echo.
+echo.
+pause >nul
+goto :empty_exit
+
+:empty_exit
+exit

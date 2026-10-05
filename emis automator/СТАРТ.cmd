@@ -1,14 +1,15 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-chdir /d "%~dp0"
 
 :: Unarchived check
+chdir /d "%~dp0"
 if not exist "components\" goto :archived_exit
 
 :: Definitions
 set "PYTHON="components\python314\python""
 set "PYTHONW="components\python314\pythonw""
+set PLAYWRIGHT_BROWSERS_PATH=0
 
 :: Open GUI
 start "" !PYTHONW! components/GUI.py
