@@ -49,7 +49,7 @@ echo     2 - План группы (темы; на вкладке "Guruhlar" / "
 echo.
 choice /C:12 /N /M "Выберите режим (нужная цифра): "
 set mode=%errorlevel%
-@REM :: only take one digit, when one digit is entered, automatically take it (no enter)
+:: only take one digit, when one digit is entered, automatically take it (no enter)
 
 echo.
 echo.
