@@ -24,7 +24,7 @@ from config_manager import JsonTwin
 # 4.
 
 
-os.chdir(os.path.dirname(sys.argv[0]))
+# os.chdir(os.path.dirname(sys.argv[0]))
 
 
 # Testing
@@ -37,7 +37,7 @@ def test():
     )
 
 
-def main(browser: Browser = None) -> None:
+def main(browser: Browser) -> None:
     # Load all configurations
     default_json: JsonTwin = JsonTwin("default.json")
 
@@ -47,12 +47,8 @@ def main(browser: Browser = None) -> None:
     input_data_json: JsonTwin = JsonTwin("input_data.json")
     web_json: JsonTwin = JsonTwin("web.json")
 
-    headless = False
-    if "--not-headless" in sys.argv:
-        headless = False
-
     if "--login" in sys.argv:
-        ensure_login(headless=headless)
+        ensure_login(browser=browser)
 
     else:
         # Ensure config.json is valid
@@ -66,10 +62,10 @@ def main(browser: Browser = None) -> None:
 
         # Ensure login
         ensure_login(
+            browser=browser,
             cookies_json=cookies_json,
             credentials_json=credentials_json,
             web_json=web_json,
-            headless=headless,
         )
 
         # # Ensure input_data.json is valid
@@ -160,7 +156,10 @@ def configure_input_data(
         counter += 1
 
 
-def ensure_json_validity(target_json: JsonTwin, its_default: JsonTwin) -> bool:
+def ensure_json_validity(
+    target_json: JsonTwin = JsonTwin("config.json"),
+    its_default: JsonTwin = JsonTwin("default.json")("config.json"),
+) -> bool:
     """Check for it's existance and for entries. If it doesn't exist it will not pass the difference check."""
     if target_json.super_keys().difference(its_default.super_keys()):
         # target_json.pull(its_default)
@@ -169,32 +168,30 @@ def ensure_json_validity(target_json: JsonTwin, its_default: JsonTwin) -> bool:
 
 
 def get_cookies(
+    browser: Browser,
     login: str,
     password: str,
     configuration: JsonTwin = JsonTwin("web.json")("login"),
-    headless: bool = True,
 ) -> dict:
     c: JsonTwin = configuration
-    with sync_playwright() as p:
-        browser: Browser = p.chromium.launch(headless=headless)
-        page: Page = browser.new_page()
-        page.goto(c("One_ID_login_url"))
-        page.click(c("One_ID_button_selector"))
+    page: Page = browser.new_page()
+    page.goto(c("One_ID_login_url"))
+    page.click(c("One_ID_button_selector"))
 
-        page.fill(c("login_field_selector"), login)
-        page.fill(c("password_field_selector"), password)
-        
-        # page.click(c("login_button_selector"))
-        # TEMPORARY
-        while page.evaluate("window.location.href") != c("success_url"):
-            time.sleep(1)
+    page.fill(c("login_field_selector"), login)
+    page.fill(c("password_field_selector"), password)
+    page.click(c("login_button_selector"))
+    # time.sleep(3)
 
-        if page.evaluate("window.location.href") != c("success_url"):
-            print("Не получилось войти.")
-        #     return None
-        cookies = page.context.storage_state()
-        browser.close()
-        return dict(cookies)
+    page.wait_for_load_state("networkidle")
+    # page.wait_for_url(c("success_url"), timeout=1)
+    if page.evaluate("window.location.href") != c("success_url"):
+        print(page.evaluate("window.location.href"), c("success_url"))
+        raise Exception("Не получилось войти.")
+
+    cookies = page.context.storage_state()
+    page.close()
+    return dict(cookies)
 
 
 # DEPRECATED
@@ -229,32 +226,30 @@ def cookies_expired(cookies_json: JsonTwin = JsonTwin("cookies.json")) -> bool:
     return smallest_expiration < time.time().__float__() + 5 * 60
 
 
-def cookie_practice_check(
-    cookies: Path | str = "cookies.json",
-    configuration: JsonTwin = JsonTwin("web.json")("login"),
-    headless: bool = True,
-):
-    """Practically checks if cookies are valid"""
-    c: JsonTwin = configuration
-    with sync_playwright() as p:
-        browser: Browser = p.chromium.launch(headless=headless).new_context(
-            storage_state=cookies
-        )
-        page: Page = browser.new_page()
-        page.goto(c("One_ID_login_url"))
-        page.wait_for_load_state("networkidle")
-        return_value = page.evaluate("window.location.href") == c("success_url")
-        print(page.evaluate("window.location.href"), c("success_url"), return_value)
-        browser.close()
-        return return_value
+# def cookie_practice_check(
+#     browser: Browser,
+#     cookies: Path | str = "cookies.json",
+#     configuration: JsonTwin = JsonTwin("web.json")("login"),
+# ):
+#     """Practically checks if cookies are valid"""
+#     c: JsonTwin = configuration
+#     browser: BrowserContext = browser.new_context(storage_state="cookies.json", no_viewport=True)
+
+#     page: Page = browser.new_page()
+#     page.goto(c("One_ID_login_url"))
+#     page.wait_for_load_state("networkidle")
+#     return_value = page.evaluate("window.location.href") == c("success_url")
+#     print(page.evaluate("window.location.href"), c("success_url"), return_value)
+#     browser.close()
+#     return return_value
 
 
 def ensure_login(
+    browser: Browser,
     cookies_json: JsonTwin = JsonTwin("cookies.json"),
     credentials_json: JsonTwin = JsonTwin("credentials.json"),
     web_json: JsonTwin = JsonTwin("web.json"),
     default_json: JsonTwin = JsonTwin("default.json"),
-    headless: bool = True,
     looping: int = 3,
 ) -> None:
     try: 
@@ -273,10 +268,10 @@ def ensure_login(
         credentials_json.set("validity", 1)
 
     cookies = get_cookies(
+        browser=browser,
         login=credentials_json("login"),
         password=credentials_json("password"),
         configuration=web_json("login"),
-        headless=headless,
     )
     cookies_json.pull(cookies)
     credentials_json.set("validity", 1)
@@ -291,18 +286,19 @@ def ensure_login(
 
     if looping > 0:
         ensure_login(
+            browser=browser,
             cookies_json=cookies_json,
             credentials_json=credentials_json,
             web_json=web_json,
-            headless=headless,
             looping=looping - 1,
         )
 
 
 if __name__ == "__main__":
-    try:
-        test() if test_mode else main()
-    except Exception as e:
-        print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Fore.RESET}")
-        exit(1)
-
+    with sync_playwright() as p:
+        b = p.chromium.launch(headless=False)
+        try:
+            test() if test_mode else main(browser=b)
+        except Exception as e:
+            print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Fore.RESET}")
+            exit(1)
