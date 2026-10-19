@@ -1,13 +1,11 @@
 import time
 import colorama
-from playwright.sync_api import sync_playwright, Browser, Page
+from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
 from config_manager import JsonTwin
 import file_utils
 
 import os
 import sys
-
-os.chdir(os.path.dirname(sys.argv[0]))
 
 
 def run_automation(browser: Browser):
@@ -202,10 +200,13 @@ def fill_line(
 
 if __name__ == "__main__":
     try:
-        run_automation()
+        os.chdir(os.path.dirname(sys.argv[0]))
+        with sync_playwright() as p:
+            b: Browser = p.chromium.launch(headless=False)
+            b: BrowserContext = b.new_context(storage_state="cookies.json")
+            run_automation(browser=b)
     except KeyboardInterrupt:
         input("\n\nВы остановили программу. Можно закрыть это окно.\n\n")
-        # time.sleep(999)
         exit()
     except Exception as e:
         print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Style.RESET_ALL}")

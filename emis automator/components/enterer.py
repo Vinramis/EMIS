@@ -3,7 +3,6 @@
 import file_utils
 # import time
 
-import os
 import playwright
 from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
 import openpyxl
@@ -20,6 +19,7 @@ config_json = JsonTwin("config.json")
 
 
 def enter_topics_program(browser: Browser):
+    import os
     directory: str = os.path.dirname(__file__)
     os.chdir(directory)
     syllabus_path: str = file_utils.find_single_excel(os.path.dirname(directory))
@@ -134,11 +134,16 @@ def enter_topic(page: Page, count: int, name: str) -> tuple[bool, bool]:
 
 if __name__ == "__main__":
     try:
-        enter_topics_program()
+        import os, sys
+        os.chdir(os.path.dirname(sys.argv[0]))
+        with sync_playwright() as p:
+            b: Browser = p.chromium.launch(headless=False)
+            b: BrowserContext = b.new_context(storage_state="cookies.json")
+            enter_topics_program(browser=b)
     except KeyboardInterrupt:
-        pass
-    #     print("\n\nВы остановили программу. Можно закрыть это окно.\n\n")
-    #     time.sleep(999)
-    # except Exception as e:
-    #     print(f"[КРИТИЧЕСКАЯ ОШИБКА] Необработанное исключение: {e}")
-    #     time.sleep(999)
+        print("\n\nВы остановили программу. Можно закрыть это окно.\n\n")
+        exit()
+    except Exception as e:
+        import colorama
+        print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Style.RESET_ALL}")
+        exit()
