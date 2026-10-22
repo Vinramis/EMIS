@@ -20,7 +20,6 @@ set PLAYWRIGHT_BROWSERS_PATH=0
 
 :: Python transition
 !PYTHON! components/startup_sequence.py
-pause >nul
 goto :empty_exit
 
 

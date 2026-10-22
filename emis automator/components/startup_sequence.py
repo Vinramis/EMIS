@@ -1,9 +1,9 @@
+import sys
+
 from playwright.sync_api import sync_playwright
 
-def main():
-    # import os
-    # os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+def main():
     print("\n\n")
     print("--- Добро пожаловать в Автоматизатор EMIS! ---")
     print("\n\n")
@@ -23,11 +23,11 @@ def main():
     print()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        b = p.chromium.launch(headless=False)
 
         print("Входим в EMIS...")
-        preparator.ensure_login(browser=browser)
-        browser = browser.new_context(storage_state="cookies.json", no_viewport=True)
+        preparator.ensure_login(browser=b)
+        b = b.new_context(storage_state="cookies.json", no_viewport=True)
 
         def choice(attempts: int = 0) -> str:
             if attempts == 0:
@@ -49,20 +49,20 @@ def main():
             print('Вы выбрали режим "План предмета"')
             preparator.configure_input_data()
             import automator
-            automator.run_automation(browser=browser)
+            automator.run_automation(browser=b)
             formatted_exit("Работа завершена.")
         elif user_choice == "2":
             print('Вы выбрали режим "План группы"')
             preparator.configure_input_data()
             import enterer
-            enterer.enter_topics_program(browser=browser)
+            enterer.enter_topics_program(browser=b)
             formatted_exit("Работа завершена.")
 
 
 
 def formatted_exit(message: str):
     input(f"\n\n\n{message} Нажмите Enter для выхода...\n\n\n")
-    exit()
+    sys.exit()
 
 
 if __name__ == "__main__":
