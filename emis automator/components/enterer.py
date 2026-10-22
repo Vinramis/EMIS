@@ -1,14 +1,11 @@
 # WORK IN PROGRESS
 
-import file_utils
-# import time
-
-import playwright
-from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
-import openpyxl
 import excel_utils
-
+import file_utils
+import openpyxl
+import playwright
 from config_manager import JsonTwin
+from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 FIELD_SELECTOR_PART1 = "#StudyGuide_data_"
 FIELD_SELECTOR_PART2 = "_topic_id"  # must be concatenated with index in the middle (from 0)
@@ -134,16 +131,18 @@ def enter_topic(page: Page, count: int, name: str) -> tuple[bool, bool]:
 
 if __name__ == "__main__":
     try:
-        import os, sys
+        import os
+        import sys
+
         os.chdir(os.path.dirname(sys.argv[0]))
         with sync_playwright() as p:
             b: Browser = p.chromium.launch(headless=False)
-            b: BrowserContext = b.new_context(storage_state="cookies.json")
-            enter_topics_program(browser=b)
+            bc: BrowserContext = b.new_context(storage_state="cookies.json")
+            enter_topics_program(browser=bc)
     except KeyboardInterrupt:
         print("\n\nВы остановили программу. Можно закрыть это окно.\n\n")
-        exit()
+        sys.exit()
     except Exception as e:
         import colorama
         print(f"{colorama.Fore.RED}[КРИТИЧЕСКАЯ ОШИБКА] {e}{colorama.Style.RESET_ALL}")
-        exit()
+        sys.exit()
